@@ -1,4 +1,4 @@
-package com.softvision.interview.adminservice;
+package com.softvision;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

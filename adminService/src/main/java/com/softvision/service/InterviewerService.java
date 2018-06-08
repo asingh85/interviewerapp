@@ -1,6 +1,6 @@
-package com.softvision.interview.adminservice.service;
+package com.softvision.service;
 
-import com.softvision.interview.adminservice.model.Interviewer;
+import com.softvision.model.Interviewer;
 import java.util.List;
 
 public interface InterviewerService <T extends Interviewer> {

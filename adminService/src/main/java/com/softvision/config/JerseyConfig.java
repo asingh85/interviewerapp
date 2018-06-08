@@ -1,6 +1,6 @@
-package com.softvision.interview.adminservice.config;
+package com.softvision.config;
 
-import com.softvision.interview.adminservice.controller.InterviewerController;
+import com.softvision.controller.InterviewerController;
 import javax.ws.rs.ApplicationPath;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.springframework.context.annotation.Configuration;

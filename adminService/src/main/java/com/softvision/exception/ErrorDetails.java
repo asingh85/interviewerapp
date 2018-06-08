@@ -1,4 +1,4 @@
-package com.softvision.interview.adminservice.exception;
+package com.softvision.exception;
 
 import java.util.Date;
 

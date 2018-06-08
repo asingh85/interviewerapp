@@ -1,4 +1,4 @@
-package com.softvision.interview.adminservice.validation;
+package com.softvision.validation;
 
 import java.util.Set;
 import javax.validation.ConstraintViolation;

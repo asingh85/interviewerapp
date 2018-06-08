@@ -21,7 +21,8 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
-    maven { url "https://repo.spring.io/milestone" }
+    maven {url "https://repo.spring.io/milestone"}
+    maven { url "https://plugins.gradle.org/m2/" }
 }
 
 
@@ -30,6 +31,7 @@ ext {
 }
 
 dependencies {
+    compile('org.sonarqube.gradle:gradle-sonarqube-plugin:1.0')
     compile('org.springframework.boot:spring-boot-starter-data-mongodb')
     compile('org.springframework.boot:spring-boot-starter-jersey')
     compile('org.springframework.boot:spring-boot-starter-web')

@@ -1,12 +1,10 @@
-package com.softvision.interview.adminservice;
+package com.softvision;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-//import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
 
 
-//@EnableEurekaServer
 @SpringBootApplication
 @EnableDiscoveryClient
 public class InterviewappApplication {

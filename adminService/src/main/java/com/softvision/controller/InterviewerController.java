@@ -1,8 +1,8 @@
-package com.softvision.interview.adminservice.controller;
+package com.softvision.controller;
 
-import com.softvision.interview.adminservice.model.Interviewer;
-import com.softvision.interview.adminservice.service.InterviewerService;
-import com.softvision.interview.adminservice.validation.ValidationUtil;
+import com.softvision.model.Interviewer;
+import com.softvision.service.InterviewerService;
+import com.softvision.validation.ValidationUtil;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -35,19 +35,11 @@ public class InterviewerController {
     @Inject
     InterviewerService interviewerService;
 
-    /*@GET
-    @Path("/welcome")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String getWelcome(){
-        return "Welcome";
-    }*/
-
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public void getInterviewerDetails(@Suspended AsyncResponse asyncResponse,
                                     @PathParam("id") String id) {
-        System.out.println("Eureka instances :" + discoveryClient.getInstances("interviewer"));
         LOGGER.info("Candidate ID is : {} ", id);
         CompletableFuture<Interviewer> future = CompletableFuture.supplyAsync(() -> interviewerService.getInterviewer(id));
         asyncResponse.resume(future.join());

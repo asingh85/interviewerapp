@@ -1,8 +1,8 @@
-package com.softvision.interview.adminservice.serviceImpl;
+package com.softvision.serviceimpl;
 
-import com.softvision.interview.adminservice.model.Interviewer;
-import com.softvision.interview.adminservice.repository.InterviewerRepository;
-import com.softvision.interview.adminservice.service.InterviewerService;
+import com.softvision.model.Interviewer;
+import com.softvision.repository.InterviewerRepository;
+import com.softvision.service.InterviewerService;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
-public class InterviewerServiceImpl implements InterviewerService<Interviewer>{
+public class InterviewerServiceImpl implements InterviewerService<Interviewer> {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(InterviewerServiceImpl.class);
 
