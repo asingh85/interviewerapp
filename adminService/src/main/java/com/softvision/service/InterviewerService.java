@@ -2,18 +2,21 @@ package com.softvision.service;
 
 import com.softvision.model.Interviewer;
 import java.util.List;
+import java.util.Optional;
 
 public interface InterviewerService <T extends Interviewer> {
 
-    List<Interviewer> getAll();
+    Optional<List<Interviewer>> getAllInterviewer();
 
-    T getInterviewer(String id);
+    Optional<T> getInterviewerById(String id);
 
-    T addInterviewer(T interviewer);
+    Optional<T> addInterviewer(T interviewer);
 
-    T updateInterviewer(T interviewer ,String id);
+    Optional<T> updateInterviewer(T interviewer ,String id);
 
     void deleteInterviewer(String id);
 
     void deleteAllInterviewers();
+
+    Optional<List<Interviewer>> getAllInterviewerByBandExp(int expInmonths , String technicalCommunity);
 }

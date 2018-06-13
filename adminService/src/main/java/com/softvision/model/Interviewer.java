@@ -1,6 +1,12 @@
 package com.softvision.model;
 
+import com.softvision.helper.LocalDateTimeAttributeConverter;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import javax.persistence.Convert;
+import javax.persistence.Converter;
 import javax.persistence.GeneratedValue;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -12,7 +18,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
 @Document(collection = "interviewer")
-public class Interviewer implements Comparable<Interviewer> {
+@NotNull
+public class Interviewer implements Comparable<Interviewer>{
 
     @Id
     @GeneratedValue
@@ -35,30 +42,24 @@ public class Interviewer implements Comparable<Interviewer> {
     @Pattern(regexp="(^$|[0-9]{10})",message="Invalid Phone number")
     private String contactNumber;
 
-    private List<String> listTechStack;
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getInterviewerID() {
-        return interviewerID;
-    }
-
-    public void setInterviewerID(String interviewerID) {
-        this.interviewerID = interviewerID;
-    }
-
     private boolean isDeleted;
+
+    @Convert(converter = LocalDateTimeAttributeConverter.class)
+    //@NotNull(message = "Creation date cannot be null")
+    private LocalDateTime createdDate;
+
+    @Convert(converter = LocalDateTimeAttributeConverter.class)
+    //@NotNull(message = "Modified date cannot be null")
+    private LocalDateTime modifiedDate;
+
+    private TechnologyCommunity technologyCommunity;
+
+    private int bandExperience;
 
     @Override
     public int compareTo(Interviewer o) {
-        int val = 0 ;
-        if(this.getFirstName().compareTo(o.getFirstName()) == -1 ) {
-            val = -1;
-        } else if( this.getFirstName().compareTo(o.getFirstName()) == 1) {
-            val = 1;
-        }
-        return val;
+        return Comparator.comparing(Interviewer::getFirstName)
+                         .thenComparing(Interviewer::getLastName)
+                         .compare(this,o);
     }
 }
