@@ -69,6 +69,7 @@ public class InterviewerServiceImpl implements InterviewerService<Interviewer> {
         query.addCriteria(Criteria.where("technologyCommunity").is(technicalCommunity)
                 .andOperator(Criteria.where("bandExperience").gte(expInmonths)));
         List<Interviewer> interviewers = mongoTemplate.find(query, Interviewer.class);
+        LOGGER.info("Interviewers information {} :" ,interviewers);
         return Optional.of(interviewers);
     }
 }

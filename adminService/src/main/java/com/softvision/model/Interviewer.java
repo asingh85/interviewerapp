@@ -59,7 +59,7 @@ public class Interviewer implements Comparable<Interviewer>{
     @Override
     public int compareTo(Interviewer o) {
         return Comparator.comparing(Interviewer::getFirstName)
-                         .thenComparing(Interviewer::getLastName)
-                         .compare(this,o);
+                .thenComparing(Interviewer::getLastName)
+                .compare(this,o);
     }
 }
