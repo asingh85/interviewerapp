@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="projectSettings">
+    <option name="alternativeWorkingDirPath" value="$PROJECT_DIR$" />
+    <option name="localAnalysisScripName" value="&lt;NO LOCAL ANALYSIS&gt;" />
+    <option name="resources">
+      <list>
+        <Resource>
+          <option name="key" value="2ae0b90965406606df997f1e6cc493aa605814dc" />
+          <option name="name" value="InterviewService" />
+          <option name="qualifier" value="TRK" />
+        </Resource>
+      </list>
+    </option>
+    <option name="serverName" value="Sonar" />
+    <option name="useAlternativeWorkingDir" value="true" />
+    <option name="workingDirSelection" value="&lt;PROJECT&gt;" />
+  </component>
+</project>

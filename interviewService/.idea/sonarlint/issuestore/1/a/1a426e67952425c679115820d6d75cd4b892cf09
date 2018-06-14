@@ -1,0 +1,8 @@
+
+[squid:UselessImportCheck	"0Remove this unused import 'java.util.ArrayList'.(÷‰îƒ8¹™ÞÇ¿,
+csquid:UselessImportCheck"9Remove this unused import 'javax.swing.text.html.Option'.(¼Òì:8Ð€ÕÇ¿,
+Usquid:S3655;"7Call "Optional#isPresent()" before accessing the value.(ª¹˜½8Ð€ÕÇ¿,
+Usquid:S3655!"7Call "Optional#isPresent()" before accessing the value.(€ë¬É8Ð€ÕÇ¿,
+[
+squid:S106H"9Replace this use of System.out or System.err by a logger.(¾”Åæùÿÿÿÿ8Ð€ÕÇ¿,
+Zsquid:S3655I"7Call "Optional#isPresent()" before accessing the value.(ÛÊáþþÿÿÿÿ8Ð€ÕÇ¿,

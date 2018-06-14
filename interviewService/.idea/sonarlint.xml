@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SonarLintProjectSettings">
+    <option name="bindingEnabled" value="true" />
+    <option name="fileExclusions">
+      <list>
+        <option value="FILE:**/*{!.java}" />
+      </list>
+    </option>
+    <option name="projectKey" value="2ae0b90965406606df997f1e6cc493aa605814dc" />
+    <option name="serverId" value="Sonarserver" />
+  </component>
+</project>

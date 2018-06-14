@@ -1,0 +1,3 @@
+
+Цsquid:S1186"АAdd a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(вшЅњ
+Ssquid:S1155">Use isEmpty() to check whether the collection is empty or not.(јµПЎ
