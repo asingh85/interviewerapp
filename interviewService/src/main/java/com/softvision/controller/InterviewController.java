@@ -1,13 +1,13 @@
 package com.softvision.controller;
 
+import com.softvision.helper.ControlInterface;
 import com.softvision.helper.Loggable;
 import com.softvision.service.InterviewService;
-import java.util.ArrayList;
+import com.softvision.service.StatusInterface;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import javax.inject.Inject;
-import javax.swing.text.html.Option;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -18,7 +18,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
@@ -32,6 +31,64 @@ public class InterviewController {
 
     @Inject
     InterviewService interviewService;
+
+    @Inject
+    ControlInterface parentInterface;
+
+    @GET
+    @Path("add")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Loggable
+    public void insertInterview(@Suspended AsyncResponse asyncResponse,
+                                @QueryParam("candidateId") String candidateId,
+                                @QueryParam("interviverId") String interviverId,
+                                @QueryParam("status") String status) {
+        LOGGER.info(" Called insertInterview -->  candidateId " + candidateId + " interviverId: " + interviverId + " status:" + status);
+
+
+        System.out.println(" Called count :" + parentInterface.getStatusInterface().length);
+        StatusInterface[] abc = parentInterface.getStatusInterface();
+        List<StatusInterface> list = Arrays.asList(abc);
+        list.stream().forEach(v -> {
+                    if (v.getStatus().equalsIgnoreCase(status))
+                        CompletableFuture.supplyAsync(() -> v.addInterview(candidateId,interviverId))
+                                .thenApply(optional -> asyncResponse.resume(optional.get()))
+                                .exceptionally(e -> asyncResponse.resume(
+                                        Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
+                }
+        );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     @GET
     @Path("/{id}")

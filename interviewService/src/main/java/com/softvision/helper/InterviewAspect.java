@@ -34,11 +34,12 @@ public class InterviewAspect {
         System.out.println(joinPoint.getArgs()[0]);
         String interviewId=(String)joinPoint.getArgs()[0];
 
-        Interview interview= interviewRepository.findById(interviewId).get();
-        if(interview != null && interview.getAcceptedCount() <=1){
-            throw new Exception();
-        }else{
-            return joinPoint.proceed();
-        }
+//        Interview interview= interviewRepository.findById(interviewId).get();
+//        if(interview != null && interview.getAcceptedCount() <=1){
+//            throw new Exception();
+//        }else{
+//            return joinPoint.proceed();
+//        }
+        return null;
     }
 }

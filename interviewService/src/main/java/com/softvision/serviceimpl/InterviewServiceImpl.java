@@ -36,11 +36,10 @@ public class InterviewServiceImpl implements InterviewService {
     @Override
   //  @Transactional(isolation = Isolation.READ_COMMITTED)
     public Optional<Interview> addInterview(Interview interview) {
-        if (interview != null) {
-            LocalDateTime joiningDate =LocalDateTime.now();
+              LocalDateTime joiningDate =LocalDateTime.now();
+            interview.setInterviewStatus(InterviewStatus.INITIATED);
             interview.setCreationTime(joiningDate);
             interview.setModifiedDate(joiningDate);
-        }
         return Optional.of(interviewRepository.save(interview));
     }
 
