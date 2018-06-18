@@ -3,6 +3,7 @@ package com.softvision.helper;
 
 import com.softvision.entities.Interview;
 import com.softvision.repository.InterviewRepository;
+import com.softvision.service.InterviewService;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.time.Duration;
@@ -26,20 +27,22 @@ public class InterviewAspect {
     public static final Logger logger = LoggerFactory.getLogger(InterviewAspect.class);
 
     @Inject
-    InterviewRepository interviewRepository;
+    InterviewService interviewService;
 
     @Around("@annotation(InsertInterviewValidator)")
     public Object permit(ProceedingJoinPoint  joinPoint) throws Throwable {
-        System.out.println(" ******called InterviewAspect *****");
-        System.out.println(joinPoint.getArgs()[0]);
-        String interviewId=(String)joinPoint.getArgs()[0];
 
-//        Interview interview= interviewRepository.findById(interviewId).get();
-//        if(interview != null && interview.getAcceptedCount() <=1){
-//            throw new Exception();
-//        }else{
-//            return joinPoint.proceed();
-//        }
-        return null;
+        System.out.println(" InsertInterviewValidator ");
+        String candidateId=(String)joinPoint.getArgs()[0];
+
+        System.out.println(" candidateId "+candidateId);
+
+      Long count = interviewService.getInterviewByCandidateId(candidateId);
+        System.out.println(" count "+count);
+        if(count >=1 ){
+            throw new Exception(" All ready one person has Acknowledged");
+        }else{
+            return joinPoint.proceed();
+        }
     }
 }

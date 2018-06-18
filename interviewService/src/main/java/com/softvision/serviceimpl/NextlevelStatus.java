@@ -13,12 +13,12 @@ import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ApprovedStatus implements StatusInterface {
+public class NextlevelStatus implements StatusInterface {
 
     @Inject
     InterviewRepository interviewRepository;
 
-    public final String status = InterviewStatus.APPROVED.toString();
+    public final String status = InterviewStatus.NEXTLEVEL.toString();
 
     public String getStatus() {
         return status;
@@ -28,7 +28,7 @@ public class ApprovedStatus implements StatusInterface {
     public Optional<Interview> addInterview(String candidateId,String interviewId){
         LocalDateTime joiningDate =LocalDateTime.now();
         Interview  interview = new Interview();
-        interview.setInterviewStatus(InterviewStatus.APPROVED);
+        interview.setInterviewStatus(InterviewStatus.NEXTLEVEL);
         List interviewList= new ArrayList<String>();
         interviewList.add(interviewId);
         interview.setInterviewerId(interviewList);

@@ -22,7 +22,7 @@ public class InitialStatus implements StatusInterface {
     }
 
     @Override
-    public Optional<Interview> addInterview(String candidateId,String interviverId){
+    public Optional<Interview> addInterview(String candidateId,String interviewId){
         LocalDateTime joiningDate =LocalDateTime.now();
         Interview  interview = new Interview();
         interview.setInterviewStatus(InterviewStatus.INITIATED);
@@ -31,7 +31,6 @@ public class InitialStatus implements StatusInterface {
         interview.setCreationTime(joiningDate);
         interview.setCandidateId(candidateId);
         interview.setDeleted(false);
-      //  Interview  interview = new Interview(candidateId,InterviewStatus.INITIATED,joiningDate,joiningDate,false);
         return Optional.of(interviewRepository.save(interview));
     }
 

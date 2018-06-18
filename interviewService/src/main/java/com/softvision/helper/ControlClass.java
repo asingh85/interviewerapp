@@ -6,10 +6,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class ControlClass implements ControlInterface {
 
-    public StatusInterface[] statusInterface = new StatusInterface[0];
+    private StatusInterface[] statusInterface;
 
     public ControlClass(
             StatusInterface[] statusInterface) {
+        this.statusInterface = new StatusInterface[0];
         this.statusInterface =  statusInterface;
     }
 
