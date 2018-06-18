@@ -8,9 +8,11 @@ import javax.validation.Validator;
 
 public class ValidationUtil {
     private static final Validator VALIDATOR = Validation.buildDefaultValidatorFactory().getValidator();
-    private ValidationUtil(){
+
+    private ValidationUtil() {
 
     }
+
     public static <T> void validate(T object) {
         Set<ConstraintViolation<T>> violations = VALIDATOR.validate(object);
         if (!violations.isEmpty()) {
