@@ -53,14 +53,23 @@ public class InterviewerServiceImpl implements InterviewerService<Interviewer> {
         return Optional.of(interviewerRepository.save(interviewer));
     }
 
-    @Override
+   @Override
     public void deleteInterviewer(String id) {
-        interviewerRepository.deleteById(id);
+        Optional<Interviewer> interviewerDAO = interviewerRepository.findById(id);
+        if (interviewerDAO.isPresent()) {
+            Interviewer optInterviwer = interviewerDAO.get();
+            optInterviwer.setDeleted(true);
+            optInterviwer.setModifiedDate(LocalDateTime.now());
+            interviewerRepository.save(optInterviwer);
+        }
     }
 
     @Override
     public void deleteAllInterviewers() {
-        interviewerRepository.deleteAll();
+
+        List<Interviewer> interviewerList = interviewerRepository.findAll();
+        interviewerList.forEach(interviewer -> interviewer.setDeleted(true));
+        interviewerRepository.saveAll(interviewerList);
     }
 
     @Override
