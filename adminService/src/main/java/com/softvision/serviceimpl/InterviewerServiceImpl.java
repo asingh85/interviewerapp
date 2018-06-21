@@ -50,10 +50,11 @@ public class InterviewerServiceImpl implements InterviewerService<Interviewer> {
         StringBuilder covertStr =  new StringBuilder();
         covertStr.append("/").append(str).append("/");
         Criteria criteria =  new Criteria();
-        criteria = criteria.orOperator(Criteria.where("firstName").regex(str)
-                            ,Criteria.where("lastgiName").regex(str)
-                            ,Criteria.where("technologyCommunity").regex(str)
-                            ,Criteria.where("interviewerID").regex(str));
+        criteria = criteria.orOperator(
+                             Criteria.where("firstName").regex(str,"si")
+                            ,Criteria.where("lastName").regex(str,"si")
+                            ,Criteria.where("technologyCommunity").regex(str,"si")
+                            ,Criteria.where("interviewerID").regex(str,"si"));
 
 
         Query query = new Query(criteria);
