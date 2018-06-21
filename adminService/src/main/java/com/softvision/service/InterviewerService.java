@@ -10,6 +10,8 @@ public interface InterviewerService <T extends Interviewer> {
 
     Optional<T> getInterviewerById(String id);
 
+    List<T> search(String  id);
+
     Optional<T> addInterviewer(T interviewer);
 
     Optional<T> updateInterviewer(T interviewer ,String id);

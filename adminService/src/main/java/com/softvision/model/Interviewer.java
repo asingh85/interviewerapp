@@ -14,6 +14,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
@@ -31,10 +32,12 @@ public class Interviewer implements Comparable<Interviewer>{
 
     @NotNull(message = "Interviewer First Name cannot be null")
     @Size(min = 2, max = 100, message = "Interviewer First Name must be atleast 2 and 100 characters")
+    @TextIndexed(weight=2)
     private String firstName;
 
     @NotNull(message = "Interviewer Last Name cannot be null")
     @Size(min = 0, max = 100, message = "Interviewer Last Name must be atleast 2 and 100 characters")
+    @TextIndexed(weight=2)
     private String lastName;
 
     private String emailId;
@@ -52,6 +55,7 @@ public class Interviewer implements Comparable<Interviewer>{
     //@NotNull(message = "Modified date cannot be null")
     private LocalDateTime modifiedDate;
 
+    @TextIndexed(weight=2)
     private TechnologyCommunity technologyCommunity;
 
     private int bandExperience;

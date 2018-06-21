@@ -49,6 +49,20 @@ public class InterviewerController {
                 .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
     }
 
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public void search(@Suspended AsyncResponse asyncResponse,
+                                   @QueryParam("str") String str) {
+        LOGGER.info("Search string is  : {} ", str);
+        if (StringUtils.isEmpty(str)) {
+            asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(" Search string cannot be NULL or Empty.").build());
+
+        }
+        CompletableFuture.supplyAsync(() -> interviewerService.search(str))
+                .thenApply(list -> asyncResponse.resume(list))
+                .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
+    }
+
 
     @GET
     @Path("all")

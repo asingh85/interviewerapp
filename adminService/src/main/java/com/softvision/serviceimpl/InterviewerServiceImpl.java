@@ -1,22 +1,30 @@
 package com.softvision.serviceimpl;
 
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.TextSearchOptions;
 import com.softvision.model.Interviewer;
 import com.softvision.repository.InterviewerRepository;
 import com.softvision.service.InterviewerService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import javax.inject.Inject;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.index.TextIndexDefinition;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.TextCriteria;
+import org.springframework.data.mongodb.core.query.TextQuery;
 import org.springframework.stereotype.Component;
 
 @Component
 public class InterviewerServiceImpl implements InterviewerService<Interviewer> {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(InterviewerServiceImpl.class);
+
 
     @Inject
     private InterviewerRepository interviewerRepository;
@@ -33,6 +41,25 @@ public class InterviewerServiceImpl implements InterviewerService<Interviewer> {
     public Optional<Interviewer> getInterviewerById(String id) {
         LOGGER.info("InterviewerServiceImpl ID is : {} ", id);
         return Optional.of(interviewerRepository.findById(id).get());
+    }
+
+    @Override
+    public List<Interviewer> search(String  str) {
+
+        LOGGER.info(" Search string is : {} ", str);
+        StringBuilder covertStr =  new StringBuilder();
+        covertStr.append("/").append(str).append("/");
+        Criteria criteria =  new Criteria();
+        criteria = criteria.orOperator(Criteria.where("firstName").regex(str)
+                            ,Criteria.where("lastgiName").regex(str)
+                            ,Criteria.where("technologyCommunity").regex(str)
+                            ,Criteria.where("interviewerID").regex(str));
+
+
+        Query query = new Query(criteria);
+
+        System.out.println(query.toString());
+        return  mongoTemplate.find(query,Interviewer.class);
     }
 
     @Override
