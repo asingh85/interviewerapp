@@ -1,9 +1,11 @@
 package com.softvision.controller;
 
+import com.softvision.constant.InterviewConstant;
+import com.softvision.exception.ServiceException;
 import com.softvision.helper.ControlInterface;
 import com.softvision.helper.Loggable;
+import com.softvision.mapper.StatusInterface;
 import com.softvision.service.InterviewService;
-import com.softvision.service.StatusInterface;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -42,16 +44,21 @@ public class InterviewController {
                                 @QueryParam("candidateId") String candidateId,
                                 @QueryParam("interviewId") String interviewId,
                                 @QueryParam("status") String status) {
-        LOGGER.info(" Called insertInterview -->  candidateId " + candidateId + " interviewId: " + interviewId + " status:" + status);
+
+        LOGGER.info("Called insertInterview {} {} {} ", candidateId,interviewId,status);
         StatusInterface[] abc = parentInterface.getStatusInterface();
         List<StatusInterface> list = Arrays.asList(abc);
-        list.stream().forEach(v -> {
-                    if (v.getStatus().equalsIgnoreCase(status))
-                        CompletableFuture.supplyAsync(() -> v.addInterview(candidateId, interviewId))
-                                .thenApply(optional -> asyncResponse.resume(optional.get()))
-                                .exceptionally(e -> asyncResponse.resume(
-                                        Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
-                }
+        list.stream().filter(v -> v.getStatus().equalsIgnoreCase(status))
+                .findAny().map(sf -> {
+            try {
+                asyncResponse.resume(sf.addInterview(candidateId, interviewId).get());
+            } catch (Exception e) {
+                asyncResponse.resume(
+                        Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build());
+            }
+            return null;
+        }).orElse(asyncResponse.resume(
+                Response.status(Response.Status.BAD_REQUEST).entity(InterviewConstant.INVALID_REQUEST).build())
         );
     }
 
@@ -64,13 +71,20 @@ public class InterviewController {
                                  @PathParam("id") String id) {
         LOGGER.info("Interview ID is : {} ", id);
         if (id != null && !id.isEmpty()) {
-            CompletableFuture.supplyAsync(() -> interviewService.getInterviewById(id))
+            CompletableFuture.supplyAsync(() -> {
+                try {
+                    return interviewService.getInterviewById(id);
+                } catch (ServiceException e) {
+                    LOGGER.error(e.getMessage());
+                    throw e;
+                }
+            })
                     .thenApply(optional -> asyncResponse.resume(optional.get()))
                     .exceptionally(e -> asyncResponse.resume(
                             Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
         } else {
             asyncResponse.resume(
-                    Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(" Interview Id cannot be NULL or Empty").build());
+                    Response.status(Response.Status.BAD_REQUEST).entity(InterviewConstant.NULL_INTERVIEW).build());
         }
     }
 
@@ -79,12 +93,19 @@ public class InterviewController {
     @Produces(MediaType.APPLICATION_JSON)
     @Loggable
     public void getAllInterview(@Suspended AsyncResponse asyncResponse) {
-        CompletableFuture.supplyAsync(() -> interviewService
-                .getAll())
+        CompletableFuture.supplyAsync(() -> {
+            try {
+                return interviewService.getAll();
+            } catch (ServiceException e) {
+                LOGGER.error(e.getMessage());
+                throw e;
+            }
+        })
                 .thenApply(optional -> asyncResponse.resume(optional.get()))
-                .exceptionally(e -> asyncResponse.resume(
-                        Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
-                                e.getMessage()).build()));
+                .exceptionally(e ->
+                        asyncResponse.resume(
+                                Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
+                                        e.getMessage()).build()));
     }
 
     @DELETE
@@ -94,10 +115,17 @@ public class InterviewController {
                                 @PathParam("id") String id) {
         LOGGER.info("Deleting Interview {} ", id);
         if (id != null && !id.isEmpty()) {
-            CompletableFuture.runAsync(() -> interviewService.deleteInterview(id));
+            CompletableFuture.runAsync(() -> {
+                try {
+                    interviewService.deleteInterview(id);
+                } catch (ServiceException e) {
+                    asyncResponse.resume(
+                            Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build());
+                }
+            });
         } else {
             asyncResponse.resume(
-                    Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(" Interview Id cannot be NULL or Empty").build());
+                    Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(InterviewConstant.NULL_INTERVIEW).build());
         }
     }
 
@@ -106,7 +134,16 @@ public class InterviewController {
     @Loggable
     public void deleteAllInterview(@Suspended AsyncResponse asyncResponse) {
         LOGGER.info(" Deleting All Interviews ");
-        CompletableFuture future = CompletableFuture.runAsync(() -> interviewService.deleteAllInterviews());
-        asyncResponse.resume(future.join());
+        CompletableFuture.runAsync(() ->
+        {
+            try {
+                interviewService.deleteAllInterviews();
+            } catch (ServiceException e) {
+                asyncResponse.resume(
+                        Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build());
+            }
+
+        });
+
     }
 }

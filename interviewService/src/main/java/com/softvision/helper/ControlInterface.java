@@ -1,6 +1,6 @@
 package com.softvision.helper;
 
-import com.softvision.service.StatusInterface;
+import com.softvision.mapper.StatusInterface;
 
 public interface ControlInterface{
 
