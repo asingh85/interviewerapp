@@ -3,6 +3,7 @@ package com.softvision.serviceimpl;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.TextSearchOptions;
 import com.softvision.model.Interviewer;
+import com.softvision.model.Login;
 import com.softvision.repository.InterviewerRepository;
 import com.softvision.service.InterviewerService;
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.data.mongodb.core.query.TextQuery;
 import org.springframework.stereotype.Component;
+import sun.rmi.runtime.Log;
 
 @Component
 public class InterviewerServiceImpl implements InterviewerService<Interviewer> {
@@ -108,5 +110,29 @@ public class InterviewerServiceImpl implements InterviewerService<Interviewer> {
         List<Interviewer> interviewers = mongoTemplate.find(query, Interviewer.class);
         LOGGER.info("Interviewers information {} :" ,interviewers);
         return Optional.of(interviewers);
+    }
+
+    @Override
+    public Login register(Login login) {
+        mongoTemplate.insert(login,"login");
+        return login;
+    }
+
+    @Override
+    public Login login(String userName, String password) {
+        Query query = new Query();
+        Criteria criteria = new Criteria();
+        criteria = criteria.andOperator(Criteria.where("userName").is(userName),
+                                        Criteria.where("password").is(password));
+        query = query.addCriteria(criteria);
+        System.out.println(query.toString());
+        try {
+            Login login = mongoTemplate.findOne(query,Login.class);
+            System.out.println("Login username " + login.getUserName());
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return  mongoTemplate.findOne(query,Login.class);
     }
 }
