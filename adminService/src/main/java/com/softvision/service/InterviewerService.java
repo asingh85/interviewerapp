@@ -23,8 +23,4 @@ public interface InterviewerService <T extends Interviewer> {
     void deleteAllInterviewers();
 
     Optional<List<Interviewer>> getAllInterviewerByBandExp(int expInmonths , String technicalCommunity);
-
-    Login register(Login login);
-
-    Login login(String userName, String password);
 }

@@ -1,6 +1,7 @@
 package com.softvision.config;
 
 import com.softvision.controller.InterviewerController;
+import com.softvision.controller.LoginController;
 import com.softvision.controller.RecruiterController;
 import javax.ws.rs.ApplicationPath;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -12,5 +13,6 @@ public class JerseyConfig extends ResourceConfig {
     public JerseyConfig() {
         register(InterviewerController.class);
         register(RecruiterController.class);
+        register(LoginController.class);
     }
 }

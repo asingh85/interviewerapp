@@ -149,27 +149,6 @@ public class InterviewerController {
         }
     }
 
-    @Path("/register/")
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public void registerUser(@Suspended AsyncResponse asyncResponse,
-                             Login login) {
 
-        asyncResponse.resume(interviewerService.register(login));
-    }
-
-
-    @Path("/register/")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public void registerUser(@Suspended AsyncResponse asyncResponse,
-                             @QueryParam("name") String name, @QueryParam("pass") String pass) {
-
-        CompletableFuture.supplyAsync(() -> interviewerService.login(name,pass))
-                        .thenApply(v -> asyncResponse.resume(v))
-                        .exceptionally(v -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(v.getMessage()).build()));
-
-    }
 
 }

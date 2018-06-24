@@ -112,27 +112,5 @@ public class InterviewerServiceImpl implements InterviewerService<Interviewer> {
         return Optional.of(interviewers);
     }
 
-    @Override
-    public Login register(Login login) {
-        mongoTemplate.insert(login,"login");
-        return login;
-    }
 
-    @Override
-    public Login login(String userName, String password) {
-        Query query = new Query();
-        Criteria criteria = new Criteria();
-        criteria = criteria.andOperator(Criteria.where("userName").is(userName),
-                                        Criteria.where("password").is(password));
-        query = query.addCriteria(criteria);
-        System.out.println(query.toString());
-        try {
-            Login login = mongoTemplate.findOne(query,Login.class);
-            System.out.println("Login username " + login.getUserName());
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return  mongoTemplate.findOne(query,Login.class);
-    }
 }
