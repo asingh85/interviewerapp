@@ -23,10 +23,11 @@ public class LoginServiceImpl implements LoginService<Login> {
     }
 
     @Override
-    public Login login(String userName, String password) {
+    public Login login(String email, String password) {
         Query query = new Query();
         Criteria criteria = new Criteria();
-        criteria = criteria.andOperator(Criteria.where("userName").is(userName),
+        criteria = criteria.andOperator(Criteria.where("emailid").is(email
+                ),
                 Criteria.where("password").is(password));
         query = query.addCriteria(criteria);
         System.out.println(query.toString());
