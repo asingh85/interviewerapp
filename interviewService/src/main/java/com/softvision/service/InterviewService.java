@@ -1,23 +1,21 @@
 package com.softvision.service;
 
-import com.softvision.entities.Interview;
-import java.util.List;
+import com.softvision.model.Interview;
+import com.softvision.exception.ServiceException;
 import java.util.Optional;
 
 public interface InterviewService<T extends Interview> {
 
-    Optional<T> getAll();
+    Optional<T> getAll() throws ServiceException;
 
-    Optional<T> getInterviewById(String id);
+    Optional<T> getInterviewById(String id) throws ServiceException;
 
-    Optional<T> addInterview(T interview);
+    void deleteInterview(String id) throws ServiceException;
 
-    void deleteInterview(String id);
+    void deleteAllInterviews() throws ServiceException;
 
-    void deleteAllInterviews();
+    long getCandidateCount(String id) throws ServiceException;
 
-    Optional<T> updateInterviewByStatus(String id,String status);
-
-    Optional<T> updateAccepted(String id,String interviewId);
+    Optional<T> addInterview(String candidateId,String interviewId,String status) throws ServiceException;
 
 }

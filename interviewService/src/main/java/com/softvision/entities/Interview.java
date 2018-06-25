@@ -9,8 +9,11 @@ import javax.persistence.GeneratedValue;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -28,19 +31,17 @@ public class Interview  {
 
     private List<String> interviewerId;
 
+    @NotNull
     private InterviewStatus interviewStatus;
 
-    @Min(0)
-    @Max(2)
-    private int acceptedCount;
-
-    private String nextInterviewerId;
-
+    @NotNull
     @Convert(converter = LocalDateTimeAttributeConverter.class)
     private LocalDateTime creationTime;
 
+    @NotNull
     @Convert(converter = LocalDateTimeAttributeConverter.class)
     private LocalDateTime modifiedDate;
 
+    @NotNull
     private boolean isDeleted;
 }

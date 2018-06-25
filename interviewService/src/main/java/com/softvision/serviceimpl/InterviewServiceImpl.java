@@ -1,20 +1,21 @@
 package com.softvision.serviceimpl;
 
-import com.softvision.entities.Interview;
-import com.softvision.entities.InterviewStatus;
-import com.softvision.helper.InsertInterviewValidator;
+import com.softvision.constant.InterviewConstant;
+import com.softvision.model.Interview;
+import com.softvision.model.InterviewStatus;
+import com.softvision.exception.ServiceException;
 import com.softvision.repository.InterviewRepository;
 import com.softvision.service.InterviewService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
-import javax.swing.text.html.Option;
+import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class InterviewServiceImpl implements InterviewService {
@@ -22,62 +23,80 @@ public class InterviewServiceImpl implements InterviewService {
     @Inject
     InterviewRepository interviewRepository;
 
+    @Inject
+    MongoTemplate mongoTemplate;
 
     @Override
-    public Optional<List<Interview>> getAll() {
-        return Optional.of(interviewRepository.findAll());
-    }
-
-    @Override
-    public Optional<Interview> getInterviewById(String id) {
-        return Optional.of( interviewRepository.findById(id).get());
-    }
-
-    @Override
-  //  @Transactional(isolation = Isolation.READ_COMMITTED)
-    public Optional<Interview> addInterview(Interview interview) {
-        if (interview != null) {
-            LocalDateTime joiningDate =LocalDateTime.now();
-            interview.setCreationTime(joiningDate);
-            interview.setModifiedDate(joiningDate);
+    public Optional<List<Interview>> getAll() throws ServiceException {
+        try {
+            return Optional.of(interviewRepository.findAll());
+        }catch (DataAccessResourceFailureException | ServiceException e) {
+            throw new ServiceException(e.getMessage());
         }
-        return Optional.of(interviewRepository.save(interview));
     }
 
     @Override
-    public void deleteInterview(String id) {
-        interviewRepository.deleteById(id);
+    public Optional<Interview> getInterviewById(String id) throws ServiceException {
+        try {
+            return interviewRepository.findById(id);
+        } catch (DataAccessResourceFailureException | ServiceException e) {
+            throw new ServiceException(e.getMessage());
+        }
     }
 
     @Override
-    public void deleteAllInterviews() {
-        interviewRepository.deleteAll();
+    public void deleteInterview(String id) throws ServiceException {
+        try {
+            Optional<Interview> interview = interviewRepository.findById(id);
+            if (interview.isPresent()) {
+                Interview interviewRec = interview.get();
+                interviewRec.setDeleted(true);
+                interviewRepository.save(interviewRec);
+            } else {
+                throw new ServiceException(InterviewConstant.INVALID_INTERVIEW);
+            }
+        } catch (DataAccessResourceFailureException | ServiceException e) {
+            throw new ServiceException(e.getMessage());
+        }
     }
 
     @Override
-    public Optional<Interview> updateInterviewByStatus(String id, String status) {
-        Interview interview = interviewRepository.findById(id).get();
-        if(interview != null) {
+    public void deleteAllInterviews() throws ServiceException {
+        try {
+            interviewRepository.deleteAll();
+        } catch (DataAccessResourceFailureException | ServiceException e) {
+            throw new ServiceException(e.getMessage());
+        }
+    }
+
+    @Override
+    public long getCandidateCount(String candidateId) throws ServiceException {
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("candidateId").is(candidateId)
+                    .andOperator(Criteria.where("interviewStatus").is(InterviewStatus.ACKNOWLEDGED)));
+            return mongoTemplate.count(query, Interview.class);
+        } catch (DataAccessResourceFailureException | ServiceException e) {
+            throw new ServiceException(e.getMessage());
+        }
+    }
+
+    @Override
+    public Optional addInterview(String candidateId, String interviewId, String status) throws ServiceException {
+        try {
+            LocalDateTime joiningDate = LocalDateTime.now();
+            Interview interview = new Interview();
             interview.setInterviewStatus(InterviewStatus.valueOf(status));
-            interview.setModifiedDate(LocalDateTime.now());
+            List interviewList = new ArrayList<String>();
+            interviewList.add(interviewId);
+            interview.setInterviewerId(interviewList);
+            interview.setModifiedDate(joiningDate);
+            interview.setCreationTime(joiningDate);
+            interview.setCandidateId(candidateId);
+            interview.setDeleted(false);
             return Optional.of(interviewRepository.save(interview));
-        }else{
-            return Optional.empty();
-        }
-    }
-
-    @Override
-    @InsertInterviewValidator
-    public Optional<Interview> updateAccepted(String interviewId, String interviewerId) {
-        System.out.println(" ----- called updateAccepted ------");
-        Interview interview = interviewRepository.findById(interviewId).get();
-        if(interview != null) {
-            interview.setInterviewStatus(InterviewStatus.ACKNOWLEDGED);
-            interview.setModifiedDate(LocalDateTime.now());
-            interview.setInterviewerId(Arrays.asList(interviewerId));
-            return Optional.of(interviewRepository.save(interview));
-        }else{
-            return Optional.empty();
+        } catch (DataAccessResourceFailureException | ServiceException e) {
+            throw new ServiceException(e.getMessage());
         }
     }
 }

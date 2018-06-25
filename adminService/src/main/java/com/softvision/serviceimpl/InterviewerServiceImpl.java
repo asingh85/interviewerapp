@@ -1,22 +1,32 @@
 package com.softvision.serviceimpl;
 
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.TextSearchOptions;
 import com.softvision.model.Interviewer;
+import com.softvision.model.Login;
 import com.softvision.repository.InterviewerRepository;
 import com.softvision.service.InterviewerService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import javax.inject.Inject;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.index.TextIndexDefinition;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.TextCriteria;
+import org.springframework.data.mongodb.core.query.TextQuery;
 import org.springframework.stereotype.Component;
+import sun.rmi.runtime.Log;
 
 @Component
 public class InterviewerServiceImpl implements InterviewerService<Interviewer> {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(InterviewerServiceImpl.class);
+
 
     @Inject
     private InterviewerRepository interviewerRepository;
@@ -33,6 +43,26 @@ public class InterviewerServiceImpl implements InterviewerService<Interviewer> {
     public Optional<Interviewer> getInterviewerById(String id) {
         LOGGER.info("InterviewerServiceImpl ID is : {} ", id);
         return Optional.of(interviewerRepository.findById(id).get());
+    }
+
+    @Override
+    public List<Interviewer> search(String  str) {
+
+        LOGGER.info(" Search string is : {} ", str);
+        StringBuilder covertStr =  new StringBuilder();
+        covertStr.append("/").append(str).append("/");
+        Criteria criteria =  new Criteria();
+        criteria = criteria.orOperator(
+                             Criteria.where("firstName").regex(str,"si")
+                            ,Criteria.where("lastName").regex(str,"si")
+                            ,Criteria.where("technologyCommunity").regex(str,"si")
+                            ,Criteria.where("interviewerID").regex(str,"si"));
+
+
+        Query query = new Query(criteria);
+
+        System.out.println(query.toString());
+        return  mongoTemplate.find(query,Interviewer.class);
     }
 
     @Override
@@ -53,14 +83,23 @@ public class InterviewerServiceImpl implements InterviewerService<Interviewer> {
         return Optional.of(interviewerRepository.save(interviewer));
     }
 
-    @Override
+   @Override
     public void deleteInterviewer(String id) {
-        interviewerRepository.deleteById(id);
+        Optional<Interviewer> interviewerDAO = interviewerRepository.findById(id);
+        if (interviewerDAO.isPresent()) {
+            Interviewer optInterviwer = interviewerDAO.get();
+            optInterviwer.setDeleted(true);
+            optInterviwer.setModifiedDate(LocalDateTime.now());
+            interviewerRepository.save(optInterviwer);
+        }
     }
 
     @Override
     public void deleteAllInterviewers() {
-        interviewerRepository.deleteAll();
+
+        List<Interviewer> interviewerList = interviewerRepository.findAll();
+        interviewerList.forEach(interviewer -> interviewer.setDeleted(true));
+        interviewerRepository.saveAll(interviewerList);
     }
 
     @Override
@@ -72,4 +111,6 @@ public class InterviewerServiceImpl implements InterviewerService<Interviewer> {
         LOGGER.info("Interviewers information {} :" ,interviewers);
         return Optional.of(interviewers);
     }
+
+
 }
