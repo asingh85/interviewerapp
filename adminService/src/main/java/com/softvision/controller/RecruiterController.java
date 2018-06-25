@@ -69,7 +69,7 @@ public class RecruiterController {
                                 @QueryParam("sort") String sortOrder) {
 
         LOGGER.info("Number of elements request is {} and sort order is {} ", size, sortOrder);
-        CompletableFuture.supplyAsync(() -> recruiterService.getAll())
+        CompletableFuture.supplyAsync(() -> recruiterService.getAllOnlyFalse())
                 .thenApply(v -> (List<Recruiter>) v.get())
                 .thenApply(k -> asyncResponse.resume(k.stream().sorted().collect(Collectors.toList())))
                 .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
