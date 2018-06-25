@@ -1,26 +1,19 @@
 package com.softvision.serviceimpl;
 
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.TextSearchOptions;
 import com.softvision.model.Interviewer;
-import com.softvision.model.Login;
+import com.softvision.model.TechnologyCommunity;
 import com.softvision.repository.InterviewerRepository;
 import com.softvision.service.InterviewerService;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Pattern;
 import javax.inject.Inject;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.index.TextIndexDefinition;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.TextCriteria;
-import org.springframework.data.mongodb.core.query.TextQuery;
 import org.springframework.stereotype.Component;
-import sun.rmi.runtime.Log;
 
 @Component
 public class InterviewerServiceImpl implements InterviewerService<Interviewer> {
@@ -111,6 +104,9 @@ public class InterviewerServiceImpl implements InterviewerService<Interviewer> {
         LOGGER.info("Interviewers information {} :" ,interviewers);
         return Optional.of(interviewers);
     }
-
-
+    @Override
+    public Optional<List<TechnologyCommunity>> getTechStack() {
+        List<TechnologyCommunity> list = Arrays.asList(TechnologyCommunity.values());
+        return Optional.of(list);
+    }
 }

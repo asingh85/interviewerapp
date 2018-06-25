@@ -1,7 +1,7 @@
 package com.softvision.controller;
 
 import com.softvision.model.Interviewer;
-import com.softvision.model.Login;
+import com.softvision.model.TechnologyCommunity;
 import com.softvision.service.InterviewerService;
 import com.softvision.validation.ValidationUtil;
 import java.util.Comparator;
@@ -13,6 +13,7 @@ import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -53,7 +54,7 @@ public class InterviewerController {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public void search(@Suspended AsyncResponse asyncResponse,
-                                   @QueryParam("str") String str) {
+                       @QueryParam("str") String str) {
         LOGGER.info("Search string is  : {} ", str);
         if (StringUtils.isEmpty(str)) {
             asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(" Search string cannot be NULL or Empty.").build());
@@ -68,6 +69,7 @@ public class InterviewerController {
     @GET
     @Path("all")
     @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
     public void getAllInterviewer(@Suspended AsyncResponse asyncResponse,
                                   @QueryParam("size") Integer size,
                                   @QueryParam("sort") String sortOrder) {
@@ -124,8 +126,12 @@ public class InterviewerController {
     @Path("/all")
     public void deleteAllInterviewer(@Suspended AsyncResponse asyncResponse) {
         LOGGER.info(" Deleting All candidates ");
+
         CompletableFuture future = CompletableFuture.runAsync(() -> interviewerService.deleteAllInterviewers());
-        asyncResponse.resume(future.join());
+        Response.ResponseBuilder rb = Response.ok("the test response");
+        Response response = rb.header("Access-Control-Allow-Origin", "*")
+                .status(Response.Status.BAD_REQUEST).entity("Input missing").build();
+        asyncResponse.resume(response);
     }
 
     @GET
@@ -149,6 +155,14 @@ public class InterviewerController {
         }
     }
 
-
-
+    @GET
+    @Path("/gettech")
+    @Produces(MediaType.APPLICATION_JSON)
+    public void getTechStack(@Suspended AsyncResponse asyncResponse) {
+        CompletableFuture<Optional<List<TechnologyCommunity>>> future = CompletableFuture
+                .supplyAsync(() -> interviewerService.getTechStack());
+        asyncResponse.resume(future.join().get().stream()
+                .sorted()
+                .collect(Collectors.toList()));
+    }
 }

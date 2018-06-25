@@ -2,7 +2,7 @@ package com.softvision.service;
 
 import com.softvision.model.Interviewer;
 import com.softvision.model.Login;
-
+import com.softvision.model.TechnologyCommunity;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,4 +23,6 @@ public interface InterviewerService <T extends Interviewer> {
     void deleteAllInterviewers();
 
     Optional<List<Interviewer>> getAllInterviewerByBandExp(int expInmonths , String technicalCommunity);
+
+    Optional<List<TechnologyCommunity>> getTechStack();
 }
