@@ -1,14 +1,14 @@
 package com.softvision.serviceimpl;
 
-import com.softvision.model.Login;
-import com.softvision.service.LoginService;
+import javax.inject.Inject;
+
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
-import sun.rmi.runtime.Log;
 
-import javax.inject.Inject;
+import com.softvision.model.Login;
+import com.softvision.service.LoginService;
 
 @Component
 public class LoginServiceImpl implements LoginService<Login> {
