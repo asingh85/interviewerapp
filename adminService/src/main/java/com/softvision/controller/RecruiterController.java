@@ -1,5 +1,6 @@
 package com.softvision.controller;
 
+import com.softvision.helper.Loggable;
 import com.softvision.model.Recruiter;
 import com.softvision.service.RecruiterService;
 import com.softvision.validation.ValidationUtil;
@@ -20,6 +21,7 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -39,6 +41,7 @@ public class RecruiterController {
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
+    @Loggable
     public void getRecruiterDetails(@Suspended AsyncResponse asyncResponse,
                                     @PathParam("id") String id) {
         LOGGER.info("Eureka instances :{}", discoveryClient.getInstances("recruiter"));
@@ -50,36 +53,31 @@ public class RecruiterController {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @Loggable
     public void getAllRecruiters(@Suspended AsyncResponse asyncResponse,
                                  @QueryParam("size") Integer size,
-                                 @QueryParam("sort") String sortOrder) {
-
-        LOGGER.info("Number of elements request is {} and sort order is {} ", size, sortOrder);
-        CompletableFuture.supplyAsync(() -> recruiterService.getAll())
-                .thenApply(v -> (List<Recruiter>) v.get())
-                .thenApply(k -> asyncResponse.resume(k.stream().sorted().filter(p -> !p.isDeleted()).collect(Collectors.toList())))
-                .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
-    }
-
-    @Path("/getAll")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public void getAllOnlyFalse(@Suspended AsyncResponse asyncResponse,
-                                @QueryParam("size") Integer size,
-                                @QueryParam("sort") String sortOrder) {
-
-        LOGGER.info("Number of elements request is {} and sort order is {} ", size, sortOrder);
-        CompletableFuture.supplyAsync(() -> recruiterService.getAllOnlyFalse())
-                .thenApply(v -> (List<Recruiter>) v.get())
-                .thenApply(k -> asyncResponse.resume(k.stream().sorted().collect(Collectors.toList())))
-                .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
-
-
+                                 @QueryParam("sort") String sortOrder,
+                                 @QueryParam("isDeleted") boolean isDeleted) {
+        LOGGER.info("Number of elements request is {} , sort order is {} and isDeleted is {} ", size, sortOrder, isDeleted);
+        if (StringUtils.isEmpty(sortOrder) && size < 1) {
+            asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Number of elements request should not be 0 and sort order should be given").build());
+        } else if (!isDeleted) {
+            CompletableFuture.supplyAsync(() -> recruiterService.getAll())
+                    .thenApply(v -> (List<Recruiter>) v.get())
+                    .thenApply(k -> asyncResponse.resume(k.stream().sorted().filter(p -> !p.isDeleted()).collect(Collectors.toList())))
+                    .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
+        } else {
+            CompletableFuture.supplyAsync(() -> recruiterService.getAll())
+                    .thenApply(v -> (List<Recruiter>) v.get())
+                    .thenApply(k -> asyncResponse.resume(k.stream().sorted().filter(p -> p.isDeleted()).collect(Collectors.toList())))
+                    .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
+        }
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @Loggable
     public void addRecruiter(@Suspended AsyncResponse asyncResponse,
                              Recruiter recruiter) {
         ValidationUtil.validate(recruiter);
@@ -93,9 +91,11 @@ public class RecruiterController {
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @Loggable
     public void updateRecruiter(@Suspended AsyncResponse asyncResponse,
                                 Recruiter recruiter, @PathParam("id") String id) {
         ValidationUtil.validate(recruiter);
+        LOGGER.info("Update recruiter {} ", id);
         CompletableFuture.supplyAsync(() -> recruiterService.updateRecruiter(recruiter, id))
                 .thenApply(recruiter1 -> asyncResponse.resume(recruiter))
                 .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
@@ -103,6 +103,7 @@ public class RecruiterController {
 
     @DELETE
     @Path("/{id}")
+    @Loggable
     public void deleteRecruiter(@Suspended AsyncResponse asyncResponse,
                                 @PathParam("id") String id) {
         LOGGER.info("Deleting recruiter {} ", id);
@@ -111,7 +112,7 @@ public class RecruiterController {
     }
 
     @DELETE
-    @Path("/all")
+    @Loggable
     public void deleteAllRecruiter(@Suspended AsyncResponse asyncResponse) {
         LOGGER.info(" Deleting All recruiters ");
         CompletableFuture future = CompletableFuture.runAsync(() -> recruiterService.deleteAllRecruiter());

@@ -1,5 +1,6 @@
 package com.softvision.controller;
 
+import com.softvision.helper.Loggable;
 import com.softvision.model.Interviewer;
 import com.softvision.model.TechnologyCommunity;
 import com.softvision.service.InterviewerService;
@@ -13,7 +14,6 @@ import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -39,6 +39,7 @@ public class InterviewerController {
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
+    @Loggable
     public void getInterviewerById(@Suspended AsyncResponse asyncResponse,
                                    @PathParam("id") String id) {
         LOGGER.info("Candidate ID is : {} ", id);
@@ -52,7 +53,9 @@ public class InterviewerController {
     }
 
     @GET
+    @Path("/search")
     @Produces(MediaType.APPLICATION_JSON)
+    @Loggable
     public void search(@Suspended AsyncResponse asyncResponse,
                        @QueryParam("str") String str) {
         LOGGER.info("Search string is  : {} ", str);
@@ -65,29 +68,35 @@ public class InterviewerController {
                 .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
     }
 
-
     @GET
-    @Path("all")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
+    @Loggable
     public void getAllInterviewer(@Suspended AsyncResponse asyncResponse,
                                   @QueryParam("size") Integer size,
-                                  @QueryParam("sort") String sortOrder) {
+                                  @QueryParam("sort") String sortOrder,
+                                  @QueryParam("isDeleted") boolean isDeleted) {
 
-        LOGGER.info("Number of elements request is {} and sort order is {} ", size, sortOrder);
+        LOGGER.info("Number of elements request is {} and sort order is {} and isDeleted {} ", size, sortOrder, isDeleted);
         if (StringUtils.isEmpty(sortOrder) && size < 1) {
             asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Number of elements request should not be 0 and sort order should be given").build());
+        } else if (!isDeleted) {
+            CompletableFuture.supplyAsync(() -> interviewerService.getAllInterviewer())
+                    .thenApply(v -> (List<Interviewer>) v.get())
+                    .thenApply(k -> asyncResponse.resume(k.stream().sorted().filter(p -> !p.isDeleted()).collect(Collectors.toList())))
+                    .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
+        } else {
+            CompletableFuture.supplyAsync(() -> interviewerService.getAllInterviewer())
+                    .thenApply(v -> (List<Interviewer>) v.get())
+                    .thenApply(k -> asyncResponse.resume(k.stream().sorted().filter(p -> p.isDeleted()).collect(Collectors.toList())))
+                    .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
         }
-        CompletableFuture.supplyAsync(() -> interviewerService.getAllInterviewer())
-                .thenApply(v -> (List<Interviewer>) v.get())
-                .thenApply(k -> asyncResponse.resume(k.stream().sorted().filter(p -> !p.isDeleted()).collect(Collectors.toList())))
-                .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
     }
 
-    @Path("/add")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @Loggable
     public void addInterviewer(@Suspended AsyncResponse asyncResponse,
                                Interviewer interviewer) {
         ValidationUtil.validate(interviewer);
@@ -96,10 +105,11 @@ public class InterviewerController {
                 .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build()));
     }
 
-    @Path("/update/{id}")
     @PUT
+    @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @Loggable
     public void updateInterviewer(@Suspended AsyncResponse asyncResponse,
                                   Interviewer interviewer, @PathParam("id") String id) {
         if (StringUtils.isEmpty(id)) {
@@ -114,6 +124,7 @@ public class InterviewerController {
 
     @DELETE
     @Path("/{id}")
+    @Loggable
     public void deleteInterviewer(@Suspended AsyncResponse asyncResponse,
                                   @PathParam("id") String id) {
 
@@ -123,7 +134,7 @@ public class InterviewerController {
     }
 
     @DELETE
-    @Path("/all")
+    @Loggable
     public void deleteAllInterviewer(@Suspended AsyncResponse asyncResponse) {
         LOGGER.info(" Deleting All candidates ");
 
@@ -135,8 +146,9 @@ public class InterviewerController {
     }
 
     @GET
-    @Path("/getAllInterviewerByBandExp")
+    @Path("/getByBandExp")
     @Produces(MediaType.APPLICATION_JSON)
+    @Loggable
     public void getAllInterviewerByBandExp(@Suspended AsyncResponse asyncResponse,
                                            @QueryParam("tc") String technologyCommunity,
                                            @QueryParam("be") int bandExperience) {
@@ -156,8 +168,9 @@ public class InterviewerController {
     }
 
     @GET
-    @Path("/gettech")
+    @Path("/getTech")
     @Produces(MediaType.APPLICATION_JSON)
+    @Loggable
     public void getTechStack(@Suspended AsyncResponse asyncResponse) {
         CompletableFuture<Optional<List<TechnologyCommunity>>> future = CompletableFuture
                 .supplyAsync(() -> interviewerService.getTechStack());

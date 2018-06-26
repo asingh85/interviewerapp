@@ -8,8 +8,6 @@ public interface RecruiterService<T extends Recruiter> {
 
     Optional<List<Recruiter>> getAll();
 
-    Optional<List<Recruiter>> getAllOnlyFalse();
-
     Optional<T> getRecruiter(String id);
 
     Optional<T> addRecruiter(T recruiter);
