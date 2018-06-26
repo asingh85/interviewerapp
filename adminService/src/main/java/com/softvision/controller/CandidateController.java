@@ -1,5 +1,7 @@
 package com.softvision.controller;
 
+import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -18,17 +20,14 @@ import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-//import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 import com.softvision.common.ServiceConstants;
 import com.softvision.model.Candidate;
 import com.softvision.service.CandidateService;
+import com.sun.jersey.core.header.FormDataContentDisposition.FormDataContentDispositionBuilder;
+import com.sun.jersey.multipart.FormDataParam;
 
 /**
  * @author arun.p
@@ -53,10 +52,9 @@ public class CandidateController {
 	 */
 	@POST
 	@Path(ServiceConstants.BACK_SLASH + ServiceConstants.CANDIDATE + ServiceConstants.BACK_SLASH + ServiceConstants.ADD)
-	@Consumes({ MediaType.APPLICATION_JSON, MediaType.MULTIPART_FORM_DATA })
-	@Produces({ MediaType.APPLICATION_JSON, MediaType.MULTIPART_FORM_DATA })
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public void addCandidate(@Suspended final AsyncResponse asyncResponse,
-			final Candidate candidate/* ,@FormDataParam ("resume") InputStream resume */) {
+			final Candidate candidate ,@FormDataParam ("resume") InputStream resume,@FormDataParam("resume") FormDataContentDispositionBuilder fileDetail) {
 		LOGGER.info("In addCandidate() :: Saving the candidate to DB");
 		CompletableFuture.supplyAsync(() -> candidateService.addCandidate(candidate))
 				.thenApply(candidate1 -> asyncResponse.resume(candidate));
