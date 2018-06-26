@@ -2,9 +2,6 @@ package com.softvision.service;
 
 import java.util.List;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import com.softvision.model.Candidate;
 
 // TODO: Auto-generated Javadoc
@@ -54,11 +51,9 @@ public interface CandidateService {
 	/**
 	 * Find all candidates.
 	 *
-	 * @param pageable
-	 *            the pageable
 	 * @return the page
 	 */
-	Page<Candidate> findAllCandidates(final Pageable pageable);
+	List<Candidate> findAllCandidates();
 
 	/**
 	 * Update candidate.
@@ -88,9 +83,8 @@ public interface CandidateService {
 	/**
 	 * Find by is active is true.
 	 *
-	 * @param page1 the page
 	 * @return the page
 	 */
-	Page<Candidate> findByIsActiveIsTrue(Pageable page);
+	List<Candidate> findByIsActiveIsTrue();
 
 }
