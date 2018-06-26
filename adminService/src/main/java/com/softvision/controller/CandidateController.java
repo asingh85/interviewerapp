@@ -21,6 +21,10 @@ import javax.ws.rs.core.Response;
 //import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import com.softvision.common.ServiceConstants;
 import com.softvision.model.Candidate;
@@ -145,16 +149,16 @@ public class CandidateController {
 	@GET
 	@Path(ServiceConstants.BACK_SLASH + ServiceConstants.CANDIDATES)
 	@Produces(MediaType.APPLICATION_JSON)
-	public void getAllCandidateDetails(@Suspended final AsyncResponse asyncResponse/*, @QueryParam("page") final int page,
+	public void getAllCandidateDetails(@Suspended final AsyncResponse asyncResponse, @QueryParam("page") final int page,
 			@QueryParam("size") final int size, @QueryParam("sortBy") final String sortBy,
-			@QueryParam("sortOrder") final String sortOrder*/) {
+			@QueryParam("sortOrder") final String sortOrder) {
 
 		LOGGER.info("In getAllCandidateDetails() :: Getting all candidates {} ");
 
-	/*	final Pageable resultPage = (Pageable) PageRequest.of(page, size,
-				(sortOrder.equalsIgnoreCase("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC), sortBy);*/
-		final CompletableFuture<List<Candidate>> future = CompletableFuture
-				.supplyAsync(() -> candidateService.findByIsActiveIsTrue());
+		final Pageable resultPage = (Pageable) PageRequest.of(page, size,
+				(sortOrder.equalsIgnoreCase("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC), sortBy);
+		final CompletableFuture<Page<Candidate>> future = CompletableFuture
+				.supplyAsync(() -> candidateService.findByIsActiveIsTrue(resultPage));
 		asyncResponse.resume(future.join());
 	}
 	
@@ -162,16 +166,16 @@ public class CandidateController {
 	@GET
 	@Path(ServiceConstants.BACK_SLASH + ServiceConstants.ALL_CANDIDATES)
 	@Produces(MediaType.APPLICATION_JSON)
-	public void getAllCandidateForAdmin(@Suspended final AsyncResponse asyncResponse/*, @QueryParam("page") final int page,
+	public void getAllCandidateForAdmin(@Suspended final AsyncResponse asyncResponse, @QueryParam("page") final int page,
 			@QueryParam("size") final int size, @QueryParam("sortBy") final String sortBy,
-			@QueryParam("sortOrder") final String sortOrder*/) {
+			@QueryParam("sortOrder") final String sortOrder) {
 
 		LOGGER.info("In getAllCandidateDetails() :: Getting all candidates {} ");
 
-		/*final Pageable resultPage = (Pageable) PageRequest.of(page, size,
-				(sortOrder.equalsIgnoreCase("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC), sortBy);*/
-		final CompletableFuture<List<Candidate>> future = CompletableFuture
-				.supplyAsync(() -> candidateService.findAllCandidates());
+		final Pageable resultPage = (Pageable) PageRequest.of(page, size,
+				(sortOrder.equalsIgnoreCase("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC), sortBy);
+		final CompletableFuture<Page<Candidate>> future = CompletableFuture
+				.supplyAsync(() -> candidateService.findAllCandidates(resultPage));
 		asyncResponse.resume(future.join());
 	}
 

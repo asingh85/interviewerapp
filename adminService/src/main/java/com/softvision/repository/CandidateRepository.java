@@ -1,7 +1,7 @@
 package com.softvision.repository;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -21,5 +21,5 @@ public interface CandidateRepository extends MongoRepository<Candidate, String> 
 	 * @param pageble the pageble
 	 * @return the page
 	 */
-	public List<Candidate> findByIsActiveIsTrue();
+	public Page<Candidate> findByIsActiveIsTrue(final Pageable pageble);
 }

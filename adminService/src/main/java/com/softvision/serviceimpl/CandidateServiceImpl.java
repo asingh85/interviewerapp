@@ -106,14 +106,14 @@ public class CandidateServiceImpl implements CandidateService {
 	 * .data.domain.Pageable)
 	 */
 	@Override
-	public List<Candidate> findAllCandidates() {
-		return candidateRepository.findAll();
+	public Page<Candidate> findAllCandidates(final Pageable pageable) {
+		return candidateRepository.findAll(pageable);
 	}
 	
 	
 	@Override
-	public List<Candidate> findByIsActiveIsTrue() {
-		return candidateRepository.findByIsActiveIsTrue();
+	public Page<Candidate> findByIsActiveIsTrue(final Pageable pageable) {
+		return candidateRepository.findByIsActiveIsTrue(pageable);
 	}
 
 
