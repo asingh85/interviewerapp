@@ -1,6 +1,5 @@
 package com.softvision.config;
 
-import com.softvision.controller.CandidateController;
 import com.softvision.controller.InterviewerController;
 import com.softvision.controller.LoginController;
 import com.softvision.controller.RecruiterController;
@@ -15,6 +14,5 @@ public class JerseyConfig extends ResourceConfig {
         register(InterviewerController.class);
         register(RecruiterController.class);
         register(LoginController.class);
-        register(CandidateController.class);
     }
 }
