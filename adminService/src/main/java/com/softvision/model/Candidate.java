@@ -3,11 +3,16 @@ package com.softvision.model;
 import java.io.File;
 import java.io.Serializable;
 import java.nio.file.Files;
+import java.time.LocalDateTime;
 import java.util.List;
+
+import javax.persistence.Convert;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import com.softvision.helper.LocalDateTimeAttributeConverter;
+
 
 /**
  * The Class Candidate.
@@ -37,7 +42,7 @@ public class Candidate extends CommonEntity implements Serializable{
     private String gender;
 
     /** The technology stack. */
-    private List<String> technologyStack;
+    private String technologyStack;
 
     /** The is active. */
     private Boolean isActive;
@@ -56,10 +61,15 @@ public class Candidate extends CommonEntity implements Serializable{
     /** The unique identity number. */
     private String uniqueIdentityNumber;
 
-    /** The interview details. */
-    private String interviewDetails;
-    
     /** The resume */
     private File resume;
+    
+    
+    @Convert(converter = LocalDateTimeAttributeConverter.class)
+    private LocalDateTime interviewDate;
+    
+    
+    @Convert(converter = LocalDateTimeAttributeConverter.class)
+    private LocalDateTime interviewTime;
 
 }

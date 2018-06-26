@@ -1,5 +1,6 @@
 package com.softvision.serviceimpl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,6 +48,9 @@ public class CandidateServiceImpl implements CandidateService {
 	 */
 	@Override
 	public Candidate addCandidate(final Candidate candidate) {
+		
+		candidate.setCreatedDate(LocalDateTime.now());
+		
 		return candidateRepository.insert(candidate);
 	}
 
@@ -82,6 +86,7 @@ public class CandidateServiceImpl implements CandidateService {
 
 		Candidate candidate = optionalCandidate.get();
 		candidate.setIsActive(false);
+		candidate.setModifiedDate(LocalDateTime.now());
 		candidateRepository.save(candidate);
 		return ServiceConstants.CANDIDATE_DELETED;
 
@@ -95,6 +100,9 @@ public class CandidateServiceImpl implements CandidateService {
 	 */
 	@Override
 	public List<Candidate> saveAllCandidates(final List<Candidate> candidates) {
+		candidates.forEach(candidate ->{candidate.setCreatedDate(LocalDateTime.now());
+		});
+		
 		return candidateRepository.saveAll(candidates);
 	}
 
@@ -129,6 +137,7 @@ public class CandidateServiceImpl implements CandidateService {
 		Optional<Candidate> optionalCandidate = candidateRepository.findById(id);
 		if (optionalCandidate.isPresent()) {
 			candidate.setCandidateId(id);
+			candidate.setModifiedDate(LocalDateTime.now());
 			return candidateRepository.save(candidate);
 		}
 		return null;
