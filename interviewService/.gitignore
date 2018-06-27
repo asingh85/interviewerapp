@@ -1,4 +1,8 @@
 /out/*
 /target/*
 /.idea/*
-/build/*
+/interviewService/build/*
+/interviewService/gradle/*
+/interviewService/.gradle/*
+.gradle/*
+.build/*

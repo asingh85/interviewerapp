@@ -1,0 +1,6 @@
+.gradle/*
+build/*
+/interviewService/.gradle
+.gradle*
+interviewService/build/*
+

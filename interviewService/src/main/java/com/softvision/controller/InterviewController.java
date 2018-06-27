@@ -25,7 +25,7 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Path("screen")
+@Path("/screen")
 public class InterviewController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InterviewController.class);
@@ -71,7 +71,7 @@ public class InterviewController {
     }
 
     @GET
-    @Path("/acknowledge")
+    @Path("acknowledge")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Loggable
