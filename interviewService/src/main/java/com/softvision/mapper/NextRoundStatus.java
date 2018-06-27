@@ -12,23 +12,20 @@ import javax.inject.Inject;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AcknowledgedStatus {
+public class NextRoundStatus {
 
     @Inject
     InterviewService interviewService;
 
 
-    public Optional<Interviewlog> acknowledgedInterview(String candidateId, String interviewId) throws ServiceException {
-        Long count = interviewService.getCandidateCount(candidateId);
-        if (count != 0) {
-            throw  new ServiceException(InterviewConstant.CANDIDATE_ACK);
-        } else {
+    public Optional<Interviewlog> moveToNextInterview(String candidateId, String currentInterviewId,String nextInterviewId) throws ServiceException {
 
-            Interview interview = (Interview)interviewService.getInterviewByCandidateId(
-                    candidateId,InterviewStatus.INITIATED.toString()).get();
+        Interview interview = (Interview)interviewService.getAcknowledgedDetail(currentInterviewId,
+                candidateId).get();
+
             LocalDateTime joiningDate = LocalDateTime.now();
 
-            // move int to previous log
+            // move ack to previous log
             Interviewlog intLogInterview = new Interviewlog();
             intLogInterview.setInterviewStatus(interview.getInterviewStatus());
             intLogInterview.setCandidateId(interview.getCandidateId());
@@ -42,14 +39,14 @@ public class AcknowledgedStatus {
             interviewService.deleteInterview(interview.getId());
 
             Interview ackInterview = new Interview();
-            ackInterview.setInterviewStatus(InterviewStatus.ACKNOWLEDGED);
+            ackInterview.setInterviewStatus(InterviewStatus.INITIATED);
             ackInterview.setCandidateId(candidateId);
-            ackInterview.setInterviewerId(interviewId);
+            ackInterview.setInterviewerId(nextInterviewId);
             ackInterview.setModifiedDate(joiningDate);
             ackInterview.setCreationTime(joiningDate);
             ackInterview.setInterviewerList(null);
             return  interviewService.addInterview(ackInterview);
-        }
+
     }
 
 }
