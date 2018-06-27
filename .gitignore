@@ -1,0 +1,12 @@
+.gradle/*
+build/*
+interviewService/.gradle/*
+.gradle*
+interviewService/build/*
+adminService/.gradle/*
+adminService/.idea/*
+adminService/out/*
+interviewService/out/*
+interviewService/.idea/*
+interviewService/*.iml
+adminService/*.iml

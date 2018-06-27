@@ -1,16 +1,0 @@
-
-esquid:UselessImportCheck"5Remove this unused import 'java.lang.reflect.Method'.(Í“¯äüÿÿÿÿ8Òì„¿,
-gsquid:UselessImportCheck"7Remove this unused import 'org.aspectj.lang.JoinPoint'.(¾Öùúÿÿÿÿ8Ï´®¿,
-dsquid:S00112'"FDefine and throw a dedicated exception instead of using a generic one.(‰Æáe8šŞşŸ¿,
-^squid:UselessImportCheck	".Remove this unused import 'java.time.Instant'.(Â‚éñÿÿÿÿÿ8Ï´®¿,
-[
-squid:S106""9Replace this use of System.out or System.err by a logger.(Õ†ŞÈÿÿÿÿÿ8ò­÷¿,
-_squid:UselessImportCheck"/Remove this unused import 'java.time.Duration'.(ëá¯‰üÿÿÿÿ8Ï´®¿,
-Zsquid:S3655%"7Call "Optional#isPresent()" before accessing the value.(ÛÊáşşÿÿÿÿ8˜Ó°Ÿ¿,
-usquid:UselessImportCheck"ERemove this unused import 'org.aspectj.lang.reflect.MethodSignature'.(÷¨­öÿÿÿÿÿ8Òì„¿,
-_squid:UselessImportCheck
-"/Remove this unused import 'java.util.Optional'.(¨˜ëİüÿÿÿÿ8˜Ó°Ÿ¿,
-V
-squid:S106!"9Replace this use of System.out or System.err by a logger.(°Íƒ¢8Ï´®¿,
-osquid:UselessImportCheck"?Remove this unused import 'org.aspectj.lang.annotation.Before'.(™ Ş¡ÿÿÿÿÿ8Ï´®¿,
-lsquid:UselessImportCheck"<Remove this unused import 'java.lang.annotation.Annotation'.(¦Ÿàáûÿÿÿÿ8Òì„¿,

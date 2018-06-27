@@ -1,7 +1,8 @@
 package com.softvision.controller;
 
+import com.softvision.common.ServiceConstants;
 import com.softvision.model.Interviewer;
-import com.softvision.model.Login;
+import com.softvision.model.TechnologyCommunity;
 import com.softvision.service.InterviewerService;
 import com.softvision.validation.ValidationUtil;
 import java.util.Comparator;
@@ -27,20 +28,32 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Path("/interviewer")
+@Path(ServiceConstants.BACK_SLASH + ServiceConstants.INTERVIEWER)
 public class InterviewerController {
 
+    /**
+     * The Constant LOGGER.
+     */
     private static final Logger LOGGER = LoggerFactory.getLogger(InterviewerController.class);
 
+    /**
+     * The interviewerService.
+     */
     @Inject
     InterviewerService interviewerService;
 
+    /**
+     * getInterviewer By Id
+     *
+     * @param asyncResponse the async response
+     * @param id            the id
+     */
     @GET
-    @Path("/{id}")
+    @Path(ServiceConstants.BACK_SLASH + ServiceConstants.OPENING_CURLY_BRACKET + ServiceConstants.ID + ServiceConstants.CLOSING_CURLY_BRACKET)
     @Produces(MediaType.APPLICATION_JSON)
     public void getInterviewerById(@Suspended AsyncResponse asyncResponse,
                                    @PathParam("id") String id) {
-        LOGGER.info("Candidate ID is : {} ", id);
+        LOGGER.info("In getInterviewerById() :: Candidate ID is : {} ", id);
         if (StringUtils.isEmpty(id)) {
             asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Interviewer Id  cannot be NULL or Empty.").build());
 
@@ -50,11 +63,18 @@ public class InterviewerController {
                 .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
     }
 
+    /**
+     * search operation
+     *
+     * @param asyncResponse the async response
+     * @param str           the str
+     */
     @GET
+    @Path(ServiceConstants.BACK_SLASH + ServiceConstants.SEARCH)
     @Produces(MediaType.APPLICATION_JSON)
     public void search(@Suspended AsyncResponse asyncResponse,
-                                   @QueryParam("str") String str) {
-        LOGGER.info("Search string is  : {} ", str);
+                       @QueryParam("str") String str) {
+        LOGGER.info("In search() :: Search string is  : {} ", str);
         if (StringUtils.isEmpty(str)) {
             asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(" Search string cannot be NULL or Empty.").build());
 
@@ -65,37 +85,67 @@ public class InterviewerController {
     }
 
 
+    /**
+     * Find all interviewers based on isDeleted 'true' OR 'false'
+     *
+     * @param asyncResponse the async response
+     * @param size          the size
+     * @param sortOrder     the sortOrder
+     * @param isDeleted     the isDeleted
+     */
     @GET
-    @Path("all")
     @Produces(MediaType.APPLICATION_JSON)
     public void getAllInterviewer(@Suspended AsyncResponse asyncResponse,
                                   @QueryParam("size") Integer size,
-                                  @QueryParam("sort") String sortOrder) {
+                                  @QueryParam("sort") String sortOrder,
+                                  @QueryParam("isDeleted") boolean isDeleted) {
 
-        LOGGER.info("Number of elements request is {} and sort order is {} ", size, sortOrder);
+        LOGGER.info("Number of elements request is {} and sort order is {} and isDeleted {} ", size, sortOrder, isDeleted);
         if (StringUtils.isEmpty(sortOrder) && size < 1) {
             asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Number of elements request should not be 0 and sort order should be given").build());
+        } else if (!isDeleted) {
+            LOGGER.info("In getAllInterviewer() :: isDeleted {}", isDeleted);
+            CompletableFuture.supplyAsync(() -> interviewerService.getAllInterviewer())
+                    .thenApply(v -> (List<Interviewer>) v.get())
+                    .thenApply(k -> asyncResponse.resume(k.stream().sorted().filter(p -> !p.isDeleted()).collect(Collectors.toList())))
+                    .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
+        } else {
+            LOGGER.info("In getAllInterviewer() :: isDeleted {}", isDeleted);
+            CompletableFuture.supplyAsync(() -> interviewerService.getAllInterviewer())
+                    .thenApply(v -> (List<Interviewer>) v.get())
+                    .thenApply(k -> asyncResponse.resume(k.stream().sorted().filter(p -> p.isDeleted()).collect(Collectors.toList())))
+                    .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
         }
-        CompletableFuture.supplyAsync(() -> interviewerService.getAllInterviewer())
-                .thenApply(v -> (List<Interviewer>) v.get())
-                .thenApply(k -> asyncResponse.resume(k.stream().sorted().filter(p -> !p.isDeleted()).collect(Collectors.toList())))
-                .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
     }
 
-    @Path("/add")
+    /**
+     * Adds the interviewer
+     *
+     * @param asyncResponse the async response
+     * @param interviewer   the interviewer
+     */
     @POST
+    @Path(ServiceConstants.BACK_SLASH + ServiceConstants.ADD)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public void addInterviewer(@Suspended AsyncResponse asyncResponse,
                                Interviewer interviewer) {
         ValidationUtil.validate(interviewer);
+        LOGGER.info("In addInterviewer() :: Saving all the interviewers to DB");
         CompletableFuture.supplyAsync(() -> interviewerService.addInterviewer(interviewer))
                 .thenApply(optional -> asyncResponse.resume(optional.get()))
                 .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build()));
     }
 
-    @Path("/update/{id}")
+    /**
+     * Update interviewer with ID
+     *
+     * @param asyncResponse the async response
+     * @param interviewer   the interviewer
+     * @param id            the id
+     */
     @PUT
+    @Path(ServiceConstants.BACK_SLASH + ServiceConstants.OPENING_CURLY_BRACKET + ServiceConstants.ID + ServiceConstants.CLOSING_CURLY_BRACKET)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public void updateInterviewer(@Suspended AsyncResponse asyncResponse,
@@ -104,32 +154,51 @@ public class InterviewerController {
             asyncResponse.resume(Response.status(Response.Status.BAD_REQUEST).entity("Input missing").build());
         }
         ValidationUtil.validate(interviewer);
+        LOGGER.info("In updateInterviewer() :: Updating interviewer {} ", id);
         CompletableFuture.supplyAsync(() -> interviewerService.updateInterviewer(interviewer, id))
                 .thenApply(optional -> asyncResponse.resume(optional.get()))
                 .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build()));
 
     }
 
+
+    /**
+     * Delete interveiwer by ID (softDelete)
+     *
+     * @param asyncResponse the async response
+     * @param id            the id
+     */
     @DELETE
-    @Path("/{id}")
+    @Path(ServiceConstants.BACK_SLASH + ServiceConstants.OPENING_CURLY_BRACKET + ServiceConstants.ID + ServiceConstants.CLOSING_CURLY_BRACKET)
     public void deleteInterviewer(@Suspended AsyncResponse asyncResponse,
                                   @PathParam("id") String id) {
 
-        LOGGER.info("Deleting candidate {} ", id);
+        LOGGER.info("In deleteInterviewer() :: Deleting interviewer {} ", id);
         CompletableFuture future = CompletableFuture.runAsync(() -> interviewerService.deleteInterviewer(id));
         asyncResponse.resume(future.join());
     }
 
+    /**
+     * Delete All Interviewers (softDelete)
+     *
+     * @param asyncResponse the async response
+     */
     @DELETE
-    @Path("/all")
     public void deleteAllInterviewer(@Suspended AsyncResponse asyncResponse) {
         LOGGER.info(" Deleting All candidates ");
         CompletableFuture future = CompletableFuture.runAsync(() -> interviewerService.deleteAllInterviewers());
         asyncResponse.resume(future.join());
     }
 
+    /**
+     * getAllInterviewers By Band And Exp
+     *
+     * @param asyncResponse       the async response
+     * @param technologyCommunity the technologyCommunity
+     * @param bandExperience      the bandExperience
+     */
     @GET
-    @Path("/getAllInterviewerByBandExp")
+    @Path(ServiceConstants.BACK_SLASH + ServiceConstants.GET_BY_BAND_EXP)
     @Produces(MediaType.APPLICATION_JSON)
     public void getAllInterviewerByBandExp(@Suspended AsyncResponse asyncResponse,
                                            @QueryParam("tc") String technologyCommunity,
@@ -149,6 +218,21 @@ public class InterviewerController {
         }
     }
 
-
+    /**
+     * getTechStack
+     *
+     * @param asyncResponse the async response
+     */
+    @GET
+    @Path(ServiceConstants.BACK_SLASH + ServiceConstants.GET_TECH)
+    @Produces(MediaType.APPLICATION_JSON)
+    public void getTechStack(@Suspended AsyncResponse asyncResponse) {
+        LOGGER.info("In getTech");
+        CompletableFuture<Optional<List<TechnologyCommunity>>> future = CompletableFuture
+                .supplyAsync(() -> interviewerService.getTechStack());
+        asyncResponse.resume(future.join().get().stream()
+                .sorted()
+                .collect(Collectors.toList()));
+    }
 
 }
