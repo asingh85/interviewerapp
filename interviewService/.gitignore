@@ -1,8 +1,0 @@
-/out/*
-/target/*
-/.idea/*
-/interviewService/build/*
-/interviewService/gradle/*
-/interviewService/.gradle/*
-.gradle/*
-.build/*

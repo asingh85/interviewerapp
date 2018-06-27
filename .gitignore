@@ -1,6 +1,10 @@
 .gradle/*
 build/*
-/interviewService/.gradle
+interviewService/.gradle/*
 .gradle*
 interviewService/build/*
-
+/adminService/.gradle/*
+/adminService/.idea/*
+/adminService/out/*
+/interviewService/out/*
+/interviewService/.idea/*
