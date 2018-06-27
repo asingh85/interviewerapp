@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.sun.jersey.contribs:jersey-multipart:1.9-ea02">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.sun.jersey.contribs/jersey-multipart/1.9-ea02/4e708ac08970b30d4cbb3b4853c9549c10493bb3/jersey-multipart-1.9-ea02.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.sun.jersey.contribs/jersey-multipart/1.9-ea02/6dfa2ea48aada6fe3979e692b384605537a724ca/jersey-multipart-1.9-ea02-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
