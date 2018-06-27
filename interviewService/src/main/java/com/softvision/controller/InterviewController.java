@@ -71,7 +71,7 @@ public class InterviewController {
     }
 
     @GET
-    @Path("acknowledge")
+    @Path("/acknowledge")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Loggable
