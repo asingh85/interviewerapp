@@ -52,9 +52,10 @@ public class CandidateController {
 	 */
 	@POST
 	@Path(ServiceConstants.BACK_SLASH + ServiceConstants.CANDIDATE + ServiceConstants.BACK_SLASH + ServiceConstants.ADD)
-	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	public void addCandidate(@Suspended final AsyncResponse asyncResponse,
-			final Candidate candidate ,@FormDataParam ("resume") InputStream resume,@FormDataParam("resume") FormDataContentDispositionBuilder fileDetail) {
+			final Candidate candidate) {
 		LOGGER.info("In addCandidate() :: Saving the candidate to DB");
 		CompletableFuture.supplyAsync(() -> candidateService.addCandidate(candidate))
 				.thenApply(candidate1 -> asyncResponse.resume(candidate));
@@ -69,8 +70,8 @@ public class CandidateController {
 	@POST
 	@Path(ServiceConstants.BACK_SLASH + ServiceConstants.CANDIDATES + ServiceConstants.BACK_SLASH
 			+ ServiceConstants.ADD)
-	@Consumes({ MediaType.APPLICATION_JSON, MediaType.MULTIPART_FORM_DATA })
-	@Produces({ MediaType.APPLICATION_JSON, MediaType.MULTIPART_FORM_DATA })
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	public void addAllCandidates(@Suspended final AsyncResponse asyncResponse, final List<Candidate> candidates) {
 		LOGGER.info("In addAllCandidates() :: Saving all the candidates to DB");
 		CompletableFuture<List<Candidate>> future = CompletableFuture
