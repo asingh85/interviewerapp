@@ -1,5 +1,6 @@
 package com.softvision.controller;
 
+import com.softvision.common.ServiceConstants;
 import com.softvision.helper.Loggable;
 import com.softvision.model.Recruiter;
 import com.softvision.service.RecruiterService;
@@ -26,22 +27,38 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 
-@Path("/recruiter")
+@Path(ServiceConstants.BACK_SLASH + ServiceConstants.RECRUITER)
 public class RecruiterController {
 
+    /**
+     * The Constant LOGGER.
+     */
     private static final Logger LOGGER = LoggerFactory.getLogger(RecruiterController.class);
 
 
+    /**
+     * The recruiterService
+     */
     @Inject
     RecruiterService recruiterService;
 
+    /**
+     * The discoveryClient
+     */
     @Inject
     DiscoveryClient discoveryClient;
 
+    /**
+     * getRecruiterDetails by ID
+     *
+     * @param asyncResponse the asyncResponse
+     * @param id            The id
+     */
     @GET
-    @Path("/{id}")
+    @Path(ServiceConstants.BACK_SLASH + ServiceConstants.OPENING_CURLY_BRACKET + ServiceConstants.ID + ServiceConstants.CLOSING_CURLY_BRACKET)
     @Produces(MediaType.APPLICATION_JSON)
     @Loggable
+
     public void getRecruiterDetails(@Suspended AsyncResponse asyncResponse,
                                     @PathParam("id") String id) {
         LOGGER.info("Eureka instances :{}", discoveryClient.getInstances("recruiter"));
@@ -51,6 +68,13 @@ public class RecruiterController {
                 .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Recruiter ID is [ " + id + " ] not available").build()));
     }
 
+    /**
+     * Find All Recruiters based on isDeleted 'true' OR 'false'
+     *
+     * @param asyncResponse the asyncResponse
+     * @param size          the size
+     * @param sortOrder     the sortOrder
+     */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Loggable
@@ -74,6 +98,12 @@ public class RecruiterController {
         }
     }
 
+    /**
+     * Adding a recruiter
+     *
+     * @param asyncResponse the asyncResponse
+     * @param recruiter     the recruiter
+     */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -87,8 +117,15 @@ public class RecruiterController {
     }
 
 
+    /**
+     * Update recruiter by ID
+     *
+     * @param asyncResponse the asyncResponse
+     * @param recruiter     the recruiter
+     * @param id            The id
+     */
     @PUT
-    @Path("/{id}")
+    @Path(ServiceConstants.BACK_SLASH + ServiceConstants.OPENING_CURLY_BRACKET + ServiceConstants.ID + ServiceConstants.CLOSING_CURLY_BRACKET)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Loggable
@@ -101,8 +138,14 @@ public class RecruiterController {
                 .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
     }
 
+    /**
+     * Delete recruiter by ID (softDelete)
+     *
+     * @param asyncResponse the asyncResponse
+     * @param id            The id
+     */
     @DELETE
-    @Path("/{id}")
+    @Path(ServiceConstants.BACK_SLASH + ServiceConstants.OPENING_CURLY_BRACKET + ServiceConstants.ID + ServiceConstants.CLOSING_CURLY_BRACKET)
     @Loggable
     public void deleteRecruiter(@Suspended AsyncResponse asyncResponse,
                                 @PathParam("id") String id) {
@@ -111,6 +154,11 @@ public class RecruiterController {
         asyncResponse.resume(future.join());
     }
 
+    /**
+     * delete All Recruiters (softDelete)
+     *
+     * @param asyncResponse the asyncResponse
+     */
     @DELETE
     @Loggable
     public void deleteAllRecruiter(@Suspended AsyncResponse asyncResponse) {

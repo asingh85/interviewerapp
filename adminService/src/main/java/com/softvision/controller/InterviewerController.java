@@ -1,5 +1,6 @@
 package com.softvision.controller;
 
+import com.softvision.common.ServiceConstants;
 import com.softvision.helper.Loggable;
 import com.softvision.model.Interviewer;
 import com.softvision.model.TechnologyCommunity;
@@ -28,16 +29,28 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Path("/interviewer")
+@Path(ServiceConstants.BACK_SLASH + ServiceConstants.INTERVIEWER)
 public class InterviewerController {
 
+    /**
+     * The Constant LOGGER.
+     */
     private static final Logger LOGGER = LoggerFactory.getLogger(InterviewerController.class);
 
+    /**
+     * The interviewerService.
+     */
     @Inject
     InterviewerService interviewerService;
 
+    /**
+     * getInterviewer By Id
+     *
+     * @param asyncResponse the async response
+     * @param id            the id
+     */
     @GET
-    @Path("/{id}")
+    @Path(ServiceConstants.BACK_SLASH + ServiceConstants.OPENING_CURLY_BRACKET + ServiceConstants.ID + ServiceConstants.CLOSING_CURLY_BRACKET)
     @Produces(MediaType.APPLICATION_JSON)
     @Loggable
     public void getInterviewerById(@Suspended AsyncResponse asyncResponse,
@@ -52,8 +65,14 @@ public class InterviewerController {
                 .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
     }
 
+    /**
+     * search operation
+     *
+     * @param asyncResponse the async response
+     * @param str           the str
+     */
     @GET
-    @Path("/search")
+    @Path(ServiceConstants.BACK_SLASH + ServiceConstants.SEARCH)
     @Produces(MediaType.APPLICATION_JSON)
     @Loggable
     public void search(@Suspended AsyncResponse asyncResponse,
@@ -68,6 +87,14 @@ public class InterviewerController {
                 .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
     }
 
+    /**
+     * Find all interviewers based on isDeleted 'true' OR 'false'
+     *
+     * @param asyncResponse the async response
+     * @param size          the size
+     * @param sortOrder     the sortOrder
+     * @param isDeleted     the isDeleted
+     */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -93,6 +120,13 @@ public class InterviewerController {
         }
     }
 
+
+    /**
+     * Adds the interviewer
+     *
+     * @param asyncResponse the async response
+     * @param interviewer   the interviewer
+     */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -105,8 +139,15 @@ public class InterviewerController {
                 .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build()));
     }
 
+    /**
+     * Update interviewer with ID
+     *
+     * @param asyncResponse the async response
+     * @param interviewer   the interviewer
+     * @param id            the id
+     */
     @PUT
-    @Path("/{id}")
+    @Path(ServiceConstants.BACK_SLASH + ServiceConstants.OPENING_CURLY_BRACKET + ServiceConstants.ID + ServiceConstants.CLOSING_CURLY_BRACKET)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Loggable
@@ -122,8 +163,14 @@ public class InterviewerController {
 
     }
 
+    /**
+     * Delete interveiwer by ID (softDelete)
+     *
+     * @param asyncResponse the async response
+     * @param id            the id
+     */
     @DELETE
-    @Path("/{id}")
+    @Path(ServiceConstants.BACK_SLASH + ServiceConstants.OPENING_CURLY_BRACKET + ServiceConstants.ID + ServiceConstants.CLOSING_CURLY_BRACKET)
     @Loggable
     public void deleteInterviewer(@Suspended AsyncResponse asyncResponse,
                                   @PathParam("id") String id) {
@@ -133,6 +180,11 @@ public class InterviewerController {
         asyncResponse.resume(future.join());
     }
 
+    /**
+     * Delete All Interviewers (softDelete)
+     *
+     * @param asyncResponse the async response
+     */
     @DELETE
     @Loggable
     public void deleteAllInterviewer(@Suspended AsyncResponse asyncResponse) {
@@ -145,8 +197,15 @@ public class InterviewerController {
         asyncResponse.resume(response);
     }
 
+    /**
+     * getAllInterviewers By Band And Exp
+     *
+     * @param asyncResponse       the async response
+     * @param technologyCommunity the technologyCommunity
+     * @param bandExperience      the bandExperience
+     */
     @GET
-    @Path("/getByBandExp")
+    @Path(ServiceConstants.BACK_SLASH + ServiceConstants.GET_BY_BAND_EXP)
     @Produces(MediaType.APPLICATION_JSON)
     @Loggable
     public void getAllInterviewerByBandExp(@Suspended AsyncResponse asyncResponse,
@@ -167,8 +226,14 @@ public class InterviewerController {
         }
     }
 
+
+    /**
+     * getTechStack
+     *
+     * @param asyncResponse the async response
+     */
     @GET
-    @Path("/getTech")
+    @Path(ServiceConstants.BACK_SLASH + ServiceConstants.GET_TECH)
     @Produces(MediaType.APPLICATION_JSON)
     @Loggable
     public void getTechStack(@Suspended AsyncResponse asyncResponse) {

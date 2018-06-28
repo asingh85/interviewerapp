@@ -1,5 +1,6 @@
 package com.softvision.config;
 
+import com.softvision.common.ServiceConstants;
 import com.softvision.controller.CandidateController;
 import com.softvision.controller.InterviewerController;
 import com.softvision.controller.LoginController;
@@ -9,7 +10,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ApplicationPath("/admin")
+@ApplicationPath(ServiceConstants.BACK_SLASH + ServiceConstants.ADMIN)
 public class JerseyConfig extends ResourceConfig {
     public JerseyConfig() {
         register(InterviewerController.class);
