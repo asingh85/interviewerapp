@@ -8,8 +8,6 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -21,8 +19,7 @@ import com.softvision.repository.CandidateRepository;
 import com.softvision.service.CandidateService;
 
 /**
- * @author arun.p 
- * The Class CandidateServiceImpl.
+ * @author arun.p The Class CandidateServiceImpl.
  *
  */
 @Service
@@ -48,9 +45,9 @@ public class CandidateServiceImpl implements CandidateService {
 	 */
 	@Override
 	public Candidate addCandidate(final Candidate candidate) {
-		
+
 		candidate.setCreatedDate(LocalDateTime.now());
-		
+
 		return candidateRepository.insert(candidate);
 	}
 
@@ -100,9 +97,7 @@ public class CandidateServiceImpl implements CandidateService {
 	 */
 	@Override
 	public List<Candidate> saveAllCandidates(final List<Candidate> candidates) {
-		candidates.forEach(candidate ->{candidate.setCreatedDate(LocalDateTime.now());
-		});
-		
+		candidates.forEach(candidate -> candidate.setCreatedDate(LocalDateTime.now()));
 		return candidateRepository.saveAll(candidates);
 	}
 
@@ -117,13 +112,11 @@ public class CandidateServiceImpl implements CandidateService {
 	public List<Candidate> findAllCandidates() {
 		return candidateRepository.findAll();
 	}
-	
-	
+
 	@Override
 	public List<Candidate> findByIsActiveIsTrue() {
 		return candidateRepository.findByIsActiveIsTrue();
 	}
-
 
 	/*
 	 * (non-Javadoc)
