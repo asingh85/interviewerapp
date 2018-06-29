@@ -19,7 +19,7 @@ public class AcknowledgedStatus {
     InterviewService interviewService;
 
 
-    public Optional<Interviewlog> acknowledgedInterview(String id, String interviewId)  {
+    public Optional<Interviewlog> acknowledgedInterview(String id, String interviewerId)  {
 
             Optional<Interview> interviewObj=interviewService.getById(id);
             if(interviewObj.isPresent()){
@@ -34,6 +34,7 @@ public class AcknowledgedStatus {
                 intLogInterview.setModifiedDate(interview.getModifiedDate());
                 intLogInterview.setCreationTime(interview.getCreationTime());
                 intLogInterview.setInterviewId(interview.getId());
+                intLogInterview.setTechnology(interview.getTechnology());
                 intLogInterview.setInterviewerList(interview.getInterviewerList());
                 interviewService.addInterviewLog(intLogInterview);
 
@@ -42,15 +43,17 @@ public class AcknowledgedStatus {
                 Interview ackInterview = new Interview();
                 ackInterview.setInterviewStatus(InterviewStatus.ACKNOWLEDGED);
                 ackInterview.setCandidateId(interview.getCandidateId());
-                ackInterview.setInterviewerId(interviewId);
+                ackInterview.setInterviewerId(interviewerId);
                 ackInterview.setModifiedDate(joiningDate);
                 ackInterview.setCreationTime(joiningDate);
+                ackInterview.setTechnology(interview.getTechnology());
                 ackInterview.setInterviewerList(null);
                 return  interviewService.addInterview(ackInterview);
 
             }else{
                 throw  new ServiceException(InterviewConstant.CANDIDATE_ACK);
             }
+
     }
 
 

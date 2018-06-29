@@ -21,7 +21,7 @@ public interface InterviewService<T> {
 
     Optional<List<T>> getAll() throws ServiceException;
 
-    Optional<List<T>> getByInterviewId(String interviewerId) throws ServiceException;
+    Optional<List<T>> getPendingByInterviewId(String interviewerId) throws ServiceException;
 
     Optional<T> getById(String id) throws ServiceException;
 

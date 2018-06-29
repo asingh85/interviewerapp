@@ -35,6 +35,7 @@ public class InitialStatus {
         interview.setModifiedDate(joiningDate);
         interview.setCreationTime(joiningDate);
         interview.setCandidateId(candidateId);
+        interview.setTechnology(technology);
         return interviewService.addInterview(interview);
 
     }

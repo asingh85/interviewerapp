@@ -33,6 +33,7 @@ public class NextRoundStatus {
             intLogInterview.setCreationTime(interview.getCreationTime());
             intLogInterview.setInterviewId(interview.getId());
             intLogInterview.setInterviewerList(interview.getInterviewerList());
+            intLogInterview.setTechnology(interview.getTechnology());
             interviewService.addInterviewLog(intLogInterview);
 
             interviewService.deleteInterview(interview.getId());
@@ -44,6 +45,7 @@ public class NextRoundStatus {
             ackInterview.setModifiedDate(joiningDate);
             ackInterview.setCreationTime(joiningDate);
             ackInterview.setInterviewerList(null);
+            ackInterview.setTechnology(interview.getTechnology());
             return  interviewService.addInterview(ackInterview);
 
     }

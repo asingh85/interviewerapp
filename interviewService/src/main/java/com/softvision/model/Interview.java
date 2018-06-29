@@ -29,6 +29,9 @@ public class Interview  {
     private InterviewStatus interviewStatus;
 
     @NotNull
+    private String technology;
+
+    @NotNull
     @Convert(converter = LocalDateTimeAttributeConverter.class)
     private LocalDateTime creationTime;
 
