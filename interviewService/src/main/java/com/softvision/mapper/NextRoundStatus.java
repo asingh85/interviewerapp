@@ -18,10 +18,9 @@ public class NextRoundStatus {
     InterviewService interviewService;
 
 
-    public Optional<Interviewlog> moveToNextInterview(String candidateId, String currentInterviewId,String nextInterviewId) throws ServiceException {
+    public Optional<Interviewlog> moveToNextInterview(String id, String nextInterviewId) throws ServiceException {
 
-        Interview interview = (Interview)interviewService.getAcknowledgedDetail(currentInterviewId,
-                candidateId).get();
+        Interview interview = (Interview) interviewService.getById(id).get();
 
             LocalDateTime joiningDate = LocalDateTime.now();
 
@@ -40,7 +39,7 @@ public class NextRoundStatus {
 
             Interview ackInterview = new Interview();
             ackInterview.setInterviewStatus(InterviewStatus.INITIATED);
-            ackInterview.setCandidateId(candidateId);
+            ackInterview.setCandidateId(interview.getCandidateId());
             ackInterview.setInterviewerId(nextInterviewId);
             ackInterview.setModifiedDate(joiningDate);
             ackInterview.setCreationTime(joiningDate);
@@ -48,7 +47,6 @@ public class NextRoundStatus {
             return  interviewService.addInterview(ackInterview);
 
     }
-
 }
 
 

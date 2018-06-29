@@ -16,9 +16,9 @@ public class ApprovedStatus {
     @Inject
     InterviewService interviewService;
 
-    public Optional<Interviewlog> addInterview(String candidateId, String interviewId) throws ServiceException {
-        Interview interview = (Interview)interviewService.getAcknowledgedDetail(interviewId,
-                candidateId).get();
+    public Optional<Interviewlog> approveCandidate(String id) throws ServiceException {
+
+        Interview interview = (Interview) interviewService.getById(id).get();
 
         LocalDateTime joiningDate = LocalDateTime.now();
 
@@ -37,8 +37,8 @@ public class ApprovedStatus {
         // move rejected to previous state
         Interviewlog rejInterview = new Interviewlog();
         rejInterview.setInterviewStatus(InterviewStatus.APPROVED);
-        rejInterview.setCandidateId(candidateId);
-        rejInterview.setInterviewerId(interviewId);
+        rejInterview.setCandidateId(interview.getCandidateId());
+        rejInterview.setInterviewerId(interview.getInterviewerId());
         rejInterview.setModifiedDate(joiningDate);
         rejInterview.setCreationTime(joiningDate);
         rejInterview.setInterviewId(interview.getId());
@@ -48,6 +48,10 @@ public class ApprovedStatus {
         interviewService.deleteInterview(interview.getId());
 
         return interviewService.addInterviewLog(rejInterview);
+    }
+
+    public Optional<Interviewlog> approvedCount(String interviewId) throws ServiceException {
+        return interviewService.getApprovedDetail(interviewId);
     }
 
    }
