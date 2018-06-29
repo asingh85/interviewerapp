@@ -22,7 +22,7 @@ public class LoginController {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public void registerUser(@Suspended AsyncResponse asyncResponse,
+    public void registerUsers(@Suspended AsyncResponse asyncResponse,
                              Login login) {
 
         asyncResponse.resume(loginService.register(login));
@@ -31,10 +31,21 @@ public class LoginController {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public void registerUser(@Suspended AsyncResponse asyncResponse,
+    public void loginValidate(@Suspended AsyncResponse asyncResponse,
                              @QueryParam("name") String name, @QueryParam("pass") String pass) {
 
         CompletableFuture.supplyAsync(() -> loginService.login(name,pass))
+                .thenApply(v -> asyncResponse.resume(v))
+                .exceptionally(v -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(v.getMessage()).build()));
+
+    }
+
+    @GET
+    @Path("/all")
+    @Produces(MediaType.APPLICATION_JSON)
+    public void getAllUsers(@Suspended AsyncResponse asyncResponse) {
+
+        CompletableFuture.supplyAsync(() -> loginService.getAll())
                 .thenApply(v -> asyncResponse.resume(v))
                 .exceptionally(v -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(v.getMessage()).build()));
 
