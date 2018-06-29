@@ -14,5 +14,11 @@ public class InterviewConstant {
 
     public static final String DB_ERROR = "Database error!";
 
+    public static final String MANAGER = "M";
 
+    public static final String INTERVIEWER = "I";
+
+    public static final String RECRUITER = "R";
+
+    public static final String ADMIN = "A";
 }

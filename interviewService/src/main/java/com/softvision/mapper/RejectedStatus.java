@@ -16,10 +16,9 @@ public class RejectedStatus {
     @Inject
     InterviewService interviewService;
 
-    public Optional<Interviewlog> rejectCandidate(String candidateId, String interviewId) throws ServiceException {
+    public Optional<Interviewlog> rejectCandidate(String id) throws ServiceException {
 
-        Interview interview = (Interview)interviewService.getAcknowledgedDetail(interviewId,
-                candidateId).get();
+        Interview interview = (Interview) interviewService.getById(id).get();
 
         LocalDateTime joiningDate = LocalDateTime.now();
 
@@ -38,8 +37,8 @@ public class RejectedStatus {
         // move rejected to previous state
         Interviewlog rejInterview = new Interviewlog();
         rejInterview.setInterviewStatus(InterviewStatus.REJECTED);
-        rejInterview.setCandidateId(candidateId);
-        rejInterview.setInterviewerId(interviewId);
+        rejInterview.setCandidateId(interview.getCandidateId());
+        rejInterview.setInterviewerId(interview.getInterviewerId());
         rejInterview.setModifiedDate(joiningDate);
         rejInterview.setCreationTime(joiningDate);
         rejInterview.setInterviewId(interview.getId());
@@ -49,5 +48,9 @@ public class RejectedStatus {
         interviewService.deleteInterview(interview.getId());
 
         return interviewService.addInterviewLog(rejInterview);
+    }
+
+    public Optional<Interviewlog> rejectedCount(String interviewId) throws ServiceException {
+        return interviewService.getRejectedDetail(interviewId);
     }
 }

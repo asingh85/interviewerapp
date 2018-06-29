@@ -15,18 +15,24 @@ public interface InterviewService<T> {
 
     void deleteInterview(String id) throws ServiceException;
 
-    Optional<T> getInterviewByCandidateId(String id,String status) throws ServiceException;
+  //  Optional<T> getInterviewByCandidateId(String id,String status) throws ServiceException;
 
-    long getCandidateCount(String id) throws ServiceException;
+  //  long getCandidateCount(String id) throws ServiceException;
 
     Optional<List<T>> getAll() throws ServiceException;
 
-    Optional<List<T>> getInterviewById(String interviewerId) throws ServiceException;
+    Optional<List<T>> getByInterviewId(String interviewerId) throws ServiceException;
+
+    Optional<T> getById(String id) throws ServiceException;
 
     void deleteAllInterviews() throws ServiceException;
 
     Optional<T> getAcknowledgedDetail(String interviewerId,String candidateId) throws ServiceException;
 
     Optional<List<T>> getAcknowledgedByID(String interviewerId) throws ServiceException;
+
+    Optional<List<Interviewlog>> getRejectedDetail(String interviewerId) throws ServiceException;
+
+    Optional<List<Interviewlog>> getApprovedDetail(String interviewerId) throws ServiceException;
 
   }
