@@ -31,6 +31,7 @@ public class RejectedStatus {
         ackInterviewLog.setCreationTime(interview.getCreationTime());
         ackInterviewLog.setInterviewId(interview.getId());
         ackInterviewLog.setInterviewerList(interview.getInterviewerList());
+        ackInterviewLog.setTechnology(interview.getTechnology());
 
         interviewService.addInterviewLog(ackInterviewLog);
 
@@ -43,6 +44,7 @@ public class RejectedStatus {
         rejInterview.setCreationTime(joiningDate);
         rejInterview.setInterviewId(interview.getId());
         rejInterview.setInterviewerList(null);
+        rejInterview.setTechnology(interview.getTechnology());
 
         // all recode with rejected status
         interviewService.deleteInterview(interview.getId());

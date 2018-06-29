@@ -71,17 +71,108 @@ public class InterviewController {
     }
 
     @GET
+    @Path("/pending/{interviewerId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Loggable
+    public void getInterviewById(@Suspended AsyncResponse asyncResponse,
+                                 @PathParam("interviewerId") String interviewerId) {
+        LOGGER.info("Interview ID is : {} ", interviewerId);
+        if (interviewerId != null && !interviewerId.isEmpty()) {
+            CompletableFuture.supplyAsync(() -> {
+                try {
+                    return interviewService.getPendingByInterviewId(interviewerId);
+                } catch (ServiceException e) {
+                    LOGGER.error(e.getMessage());
+                    throw e;
+                }
+            })
+                    .thenApply(optional -> asyncResponse.resume(optional.get()))
+                    .exceptionally(e -> asyncResponse.resume(
+                            Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
+        } else {
+            asyncResponse.resume(
+                    Response.status(Response.Status.BAD_REQUEST).entity(InterviewConstant.NULL_INTERVIEW).build());
+        }
+    }
+
+    @GET
+    @Path("/ack/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Loggable
+    public void getInterviewAckById(@Suspended AsyncResponse asyncResponse,
+                                    @PathParam("id") String id) {
+        LOGGER.info("Interview ID is : {} ", id);
+        if (id != null && !id.isEmpty()) {
+            CompletableFuture.supplyAsync(() -> {
+                try {
+                    return acknowledgedStatus.getAcknowledgedByID(id);
+                } catch (ServiceException e) {
+                    LOGGER.error(e.getMessage());
+                    throw e;
+                }
+            })
+                    .thenApply(optional -> asyncResponse.resume(optional.get()))
+                    .exceptionally(e -> asyncResponse.resume(
+                            Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
+        } else {
+            asyncResponse.resume(
+                    Response.status(Response.Status.BAD_REQUEST).entity(InterviewConstant.NULL_INTERVIEW).build());
+        }
+    }
+
+    @GET
+    @Path("/reject/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Loggable
+    public void rejectedCount(@Suspended AsyncResponse asyncResponse,
+                              @PathParam("id") String id) {
+        LOGGER.info("Called rejected candidateId is : {}", id);
+        if (id != null && !id.isEmpty()) {
+            CompletableFuture.supplyAsync(() -> {
+                return rejectedStatus.rejectedCount(id);
+            }).thenApply(optional -> asyncResponse.resume(optional.get()))
+                    .exceptionally(e -> asyncResponse.resume(
+                            Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
+        } else {
+            asyncResponse.resume(
+                    Response.status(Response.Status.BAD_REQUEST).entity(InterviewConstant.INVALID_REQUEST).build());
+        }
+    }
+
+
+    @GET
+    @Path("/approve/{interviewerId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Loggable
+    public void approvedCount(@Suspended AsyncResponse asyncResponse,
+                              @PathParam("interviewerId") String interviewerId) {
+        if (interviewerId != null && !interviewerId.isEmpty()) {
+            CompletableFuture.supplyAsync(() -> {
+                return approvedStatus.approvedCount(interviewerId);
+            }).thenApply(optional -> asyncResponse.resume(optional.get()))
+                    .exceptionally(e -> asyncResponse.resume(
+                            Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
+        } else {
+            asyncResponse.resume(
+                    Response.status(Response.Status.BAD_REQUEST).entity(InterviewConstant.INVALID_REQUEST).build());
+        }
+    }
+
+
+    @GET
     @Path("/acknowledge")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Loggable
     public void acknowledged(@Suspended AsyncResponse asyncResponse,
                              @QueryParam("id") String id,
-                             @QueryParam("interviewId") String interviewId) {
-        if ((id != null && !id.isEmpty())&& (interviewId!= null && !interviewId.isEmpty())
+                             @QueryParam("interviewerId") String interviewerId) {
+        if ((id != null && !id.isEmpty())&& (interviewerId!= null && !interviewerId.isEmpty())
                 ) {
             CompletableFuture.supplyAsync(() -> {
-                return acknowledgedStatus.acknowledgedInterview(id, interviewId);
+                return acknowledgedStatus.acknowledgedInterview(id, interviewerId);
             }).thenApply(optional -> asyncResponse.resume(optional.get()))
                     .exceptionally(e -> asyncResponse.resume(
                             Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
@@ -111,26 +202,6 @@ public class InterviewController {
         }
     }
 
-    @GET
-    @Path("/reject/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Loggable
-    public void rejectedCount(@Suspended AsyncResponse asyncResponse,
-                         @PathParam("id") String id) {
-        LOGGER.info("Called rejected candidateId is : {}", id);
-        if (id != null && !id.isEmpty()) {
-            CompletableFuture.supplyAsync(() -> {
-                return rejectedStatus.rejectedCount(id);
-            }).thenApply(optional -> asyncResponse.resume(optional.get()))
-                    .exceptionally(e -> asyncResponse.resume(
-                            Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
-        } else {
-            asyncResponse.resume(
-                    Response.status(Response.Status.BAD_REQUEST).entity(InterviewConstant.INVALID_REQUEST).build());
-        }
-    }
-
 
     @GET
     @Path("/approve")
@@ -138,10 +209,14 @@ public class InterviewController {
     @Produces(MediaType.APPLICATION_JSON)
     @Loggable
     public void approved(@Suspended AsyncResponse asyncResponse,
-                         @QueryParam("id") String id) {
-        if (id != null && !id.isEmpty()) {
+                         @QueryParam("id") String id ,
+                         @QueryParam("nextInterviewerId") String nextInterviewerId,
+                         @QueryParam("interviewerType") String interviewerType) {
+            if ((id != null && !id.isEmpty())
+                    && (nextInterviewerId != null && !nextInterviewerId.isEmpty())
+                    && (interviewerType != null && !interviewerType.isEmpty())) {
             CompletableFuture.supplyAsync(() -> {
-                return approvedStatus.approveCandidate(id);
+                return approvedStatus.approveCandidate(id,nextInterviewerId,interviewerType);
             }).thenApply(optional -> asyncResponse.resume(optional.get()))
                     .exceptionally(e -> asyncResponse.resume(
                             Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
@@ -150,26 +225,6 @@ public class InterviewController {
                     Response.status(Response.Status.BAD_REQUEST).entity(InterviewConstant.INVALID_REQUEST).build());
         }
     }
-
-    @GET
-    @Path("/approve/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Loggable
-    public void approvedCount(@Suspended AsyncResponse asyncResponse,
-                         @PathParam("id") String id) {
-        if (id != null && !id.isEmpty()) {
-            CompletableFuture.supplyAsync(() -> {
-                return approvedStatus.approveCandidate(id);
-            }).thenApply(optional -> asyncResponse.resume(optional.get()))
-                    .exceptionally(e -> asyncResponse.resume(
-                            Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
-        } else {
-            asyncResponse.resume(
-                    Response.status(Response.Status.BAD_REQUEST).entity(InterviewConstant.INVALID_REQUEST).build());
-        }
-    }
-
 
     @GET
     @Path("/next")
@@ -189,56 +244,6 @@ public class InterviewController {
         } else {
             asyncResponse.resume(
                     Response.status(Response.Status.BAD_REQUEST).entity(InterviewConstant.INVALID_REQUEST).build());
-        }
-    }
-
-    @GET
-    @Path("/pending/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Loggable
-    public void getInterviewById(@Suspended AsyncResponse asyncResponse,
-                                 @PathParam("id") String id) {
-        LOGGER.info("Interview ID is : {} ", id);
-        if (id != null && !id.isEmpty()) {
-            CompletableFuture.supplyAsync(() -> {
-                try {
-                    return interviewService.getByInterviewId(id);
-                } catch (ServiceException e) {
-                    LOGGER.error(e.getMessage());
-                    throw e;
-                }
-            })
-                    .thenApply(optional -> asyncResponse.resume(optional.get()))
-                    .exceptionally(e -> asyncResponse.resume(
-                            Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
-        } else {
-            asyncResponse.resume(
-                    Response.status(Response.Status.BAD_REQUEST).entity(InterviewConstant.NULL_INTERVIEW).build());
-        }
-    }
-
-    @GET
-    @Path("/ack/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Loggable
-    public void getInterviewAckById(@Suspended AsyncResponse asyncResponse,
-                                 @PathParam("id") String id) {
-        LOGGER.info("Interview ID is : {} ", id);
-        if (id != null && !id.isEmpty()) {
-            CompletableFuture.supplyAsync(() -> {
-                try {
-                    return acknowledgedStatus.getAcknowledgedByID(id);
-                } catch (ServiceException e) {
-                    LOGGER.error(e.getMessage());
-                    throw e;
-                }
-            })
-                    .thenApply(optional -> asyncResponse.resume(optional.get()))
-                    .exceptionally(e -> asyncResponse.resume(
-                            Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
-        } else {
-            asyncResponse.resume(
-                    Response.status(Response.Status.BAD_REQUEST).entity(InterviewConstant.NULL_INTERVIEW).build());
         }
     }
 
@@ -301,29 +306,4 @@ public class InterviewController {
         });
 
     }
-
-//    @GET
-//    @Path("/ACK")
-//    @Produces(MediaType.APPLICATION_JSON)
-//    @Loggable
-//    public void getAcknowledgedDetail(@Suspended AsyncResponse asyncResponse,
-//                                      @PathParam("interviewId") String interviewId) {
-//        LOGGER.info("Called getAcknowledgedDetail with :Interview ID is : {} ", interviewId);
-//        if (interviewId != null && !interviewId.isEmpty()) {
-//            CompletableFuture.supplyAsync(() -> {
-//                try {
-//                    return interviewService.getAcknowledgedDetail(interviewId);
-//                } catch (ServiceException e) {
-//                    LOGGER.error(e.getMessage());
-//                    throw e;
-//                }
-//            })
-//                    .thenApply(optional -> asyncResponse.resume(optional.get()))
-//                    .exceptionally(e -> asyncResponse.resume(
-//                            Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
-//        } else {
-//            asyncResponse.resume(
-//                    Response.status(Response.Status.BAD_REQUEST).entity(InterviewConstant.NULL_INTERVIEW).build());
-//        }
-//    }
 }

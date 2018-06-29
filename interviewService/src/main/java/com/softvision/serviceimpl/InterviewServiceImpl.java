@@ -42,7 +42,7 @@ public class InterviewServiceImpl implements InterviewService<Interview> {
     }
 
     @Override
-    public Optional<List<Interview>> getByInterviewId(String interviewerId) throws ServiceException {
+    public Optional<List<Interview>> getPendingByInterviewId(String interviewerId) throws ServiceException {
         try {
             Criteria criteria = new Criteria();
             criteria = criteria.where("interviewStatus").is(InterviewStatus.INITIATED)

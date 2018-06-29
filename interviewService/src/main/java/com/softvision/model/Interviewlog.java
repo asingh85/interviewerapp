@@ -31,6 +31,9 @@ public class Interviewlog {
     private List<String> interviewerList;
 
     @NotNull
+    private String technology;
+
+    @NotNull
     private InterviewStatus interviewStatus;
 
     @NotNull
