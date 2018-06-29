@@ -77,10 +77,9 @@ public class InterviewController {
     @Loggable
     public void acknowledged(@Suspended AsyncResponse asyncResponse,
                              @QueryParam("id") String id,
-                             @QueryParam("interviewId") String interviewId,
-                             @QueryParam("interviewType") String interviewType) {
+                             @QueryParam("interviewId") String interviewId) {
         if ((id != null && !id.isEmpty())&& (interviewId!= null && !interviewId.isEmpty())
-                && (interviewType!= null && !interviewType.isEmpty())) {
+                ) {
             CompletableFuture.supplyAsync(() -> {
                 return acknowledgedStatus.acknowledgedInterview(id, interviewId);
             }).thenApply(optional -> asyncResponse.resume(optional.get()))
