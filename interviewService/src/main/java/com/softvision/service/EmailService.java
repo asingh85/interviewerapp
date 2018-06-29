@@ -19,5 +19,4 @@ public interface EmailService {
 	 */
 	String sendEmail(final Email email) throws ServiceException;
 
-
 }

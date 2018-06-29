@@ -51,7 +51,7 @@ public class ServiceConstants {
 	public static final String SEARCH = "search";
 	
 	/** The Constant CANDIDATE_NOT_FOUND. */
-	public static final String CANDIDATE_NOT_FOUND = "The selected candidate found";
+	public static final String CANDIDATE_NOT_FOUND = "The selected candidate not found";
 	
 	/** The Constant CANDIDATE_DELETED. */
 	public static final String CANDIDATE_DELETED = "Candidate has been deleted successfully";

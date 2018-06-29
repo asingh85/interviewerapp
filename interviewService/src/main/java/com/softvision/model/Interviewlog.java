@@ -7,16 +7,21 @@ import javax.persistence.Convert;
 import javax.persistence.GeneratedValue;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "interview")
+@Document(collection = "interviewLog")
 @Data
-public class Interview  {
+//@EqualsAndHashCode(callSuper=false)
+public class Interviewlog {
 
     @Id
     @GeneratedValue
     private String id;
+
+    @NotNull
+    private String interviewId;
 
     @NotNull
     private String candidateId;
@@ -35,4 +40,5 @@ public class Interview  {
     @NotNull
     @Convert(converter = LocalDateTimeAttributeConverter.class)
     private LocalDateTime modifiedDate;
-}
+
+ }

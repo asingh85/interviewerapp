@@ -1,13 +1,0 @@
-
-Isquid:S1481"+Remove this unused "future" local variable.(ñ·ÊÕ8’Ú„È¿,
-[squid:S2629“"7Use the built-in formatting to construct this argument.(¼æä¶ùÿÿÿÿ8¯Ë¡È¿,
-esquid:S3457“"AFormat specifiers should be used instead of string concatenation.(¼æä¶ùÿÿÿÿ8¯Ë¡È¿,
-dsquid:S3457{"AFormat specifiers should be used instead of string concatenation.(»ïòùÿÿÿÿ8Ï´®¿,
-Zsquid:S2629{"7Use the built-in formatting to construct this argument.(»ïòùÿÿÿÿ8Ï´®¿,
-Ysquid:S1854•":Remove this useless assignment to local variable "future".(ñ·ÊÕ8¯Ë¡È¿,
-Jsquid:S1481•"+Remove this unused "future" local variable.(ñ·ÊÕ8¯Ë¡È¿,
-_squid:S3457Q"AFormat specifiers should be used instead of string concatenation.(„ƒÎÉ8Ï´®¿,
-hsquid:CommentedOutCodeLine@"<This block of commented-out lines of code should be removed.(×½±88ê€¹Â¿,
-Xsquid:S1854":Remove this useless assignment to local variable "future".(ñ·ÊÕ8’Ú„È¿,
-Usquid:S2629Q"7Use the built-in formatting to construct this argument.(„ƒÎÉ8Ï´®¿,
-[squid:UselessImportCheck"0Remove this unused import 'java.util.ArrayList'.(÷‰îƒ8ú‹æ»¿,

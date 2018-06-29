@@ -1,6 +1,8 @@
 package com.softvision.serviceimpl;
 
 import javax.inject.Inject;
+
+import com.softvision.repository.LoginRepository;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -9,12 +11,17 @@ import org.springframework.stereotype.Component;
 import com.softvision.model.Login;
 import com.softvision.service.LoginService;
 
+import java.util.List;
+
 
 @Component
 public class LoginServiceImpl implements LoginService<Login> {
 
     @Inject
     MongoTemplate mongoTemplate;
+
+    @Inject
+    LoginRepository loginRepository;
 
     @Override
     public Login register(Login login) {
@@ -35,6 +42,11 @@ public class LoginServiceImpl implements LoginService<Login> {
         System.out.println("All docs : " + mongoTemplate.findAll(Login.class));
         System.out.println("All docs : " + mongoTemplate.findOne(query,Login.class));
         return mongoTemplate.findOne(query,Login.class);
+    }
+
+    @Override
+    public List<Login> getAll() {
+       return loginRepository.findAll();
     }
 
 }

@@ -60,6 +60,8 @@ public class Interviewer implements Comparable<Interviewer>{
 
     private int bandExperience;
 
+    private String interviewerType;
+
     @Override
     public int compareTo(Interviewer o) {
         return Comparator.comparing(Interviewer::getFirstName)

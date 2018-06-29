@@ -1,6 +1,7 @@
 package com.softvision.serviceimpl;
 
 import com.softvision.model.Interviewer;
+import com.softvision.model.InterviewerType;
 import com.softvision.model.TechnologyCommunity;
 import com.softvision.repository.InterviewerRepository;
 import com.softvision.service.InterviewerService;
@@ -120,6 +121,12 @@ public class InterviewerServiceImpl implements InterviewerService<Interviewer> {
     @Override
     public Optional<List<TechnologyCommunity>> getTechStack() {
         List<TechnologyCommunity> list = Arrays.asList(TechnologyCommunity.values());
+        return Optional.of(list);
+    }
+
+    @Override
+    public Optional<List<InterviewerType>> getInterviewerType() {
+        List<InterviewerType> list = Arrays.asList(InterviewerType.values());
         return Optional.of(list);
     }
 }

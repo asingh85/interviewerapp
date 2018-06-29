@@ -2,6 +2,7 @@ package com.softvision.controller;
 
 import com.softvision.helper.Loggable;
 import com.softvision.model.Interviewer;
+import com.softvision.model.InterviewerType;
 import com.softvision.model.TechnologyCommunity;
 import com.softvision.service.InterviewerService;
 import com.softvision.validation.ValidationUtil;
@@ -146,7 +147,7 @@ public class InterviewerController {
     }
 
     @GET
-    @Path("/getByBandExp")
+    @Path("/bybandexp")
     @Produces(MediaType.APPLICATION_JSON)
     @Loggable
     public void getAllInterviewerByBandExp(@Suspended AsyncResponse asyncResponse,
@@ -168,12 +169,24 @@ public class InterviewerController {
     }
 
     @GET
-    @Path("/getTech")
+    @Path("/tech")
     @Produces(MediaType.APPLICATION_JSON)
     @Loggable
     public void getTechStack(@Suspended AsyncResponse asyncResponse) {
         CompletableFuture<Optional<List<TechnologyCommunity>>> future = CompletableFuture
                 .supplyAsync(() -> interviewerService.getTechStack());
+        asyncResponse.resume(future.join().get().stream()
+                .sorted()
+                .collect(Collectors.toList()));
+    }
+
+    @GET
+    @Path("/interviewertype")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Loggable
+    public void getInterviewerType(@Suspended AsyncResponse asyncResponse) {
+        CompletableFuture<Optional<List<InterviewerType>>> future = CompletableFuture
+                .supplyAsync(() -> interviewerService.getInterviewerType());
         asyncResponse.resume(future.join().get().stream()
                 .sorted()
                 .collect(Collectors.toList()));

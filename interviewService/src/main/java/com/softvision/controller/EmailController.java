@@ -1,3 +1,4 @@
+
 package com.softvision.controller;
 
 import java.util.concurrent.CompletableFuture;
@@ -53,3 +54,4 @@ public class EmailController {
 	}
 
 }
+

@@ -1,9 +1,12 @@
 package com.softvision.serviceimpl;
 
 import com.softvision.constant.InterviewConstant;
+import com.softvision.helper.Loggable;
 import com.softvision.model.Interview;
 import com.softvision.model.InterviewStatus;
 import com.softvision.exception.ServiceException;
+import com.softvision.model.Interviewlog;
+import com.softvision.repository.InterviewLogRepository;
 import com.softvision.repository.InterviewRepository;
 import com.softvision.service.InterviewService;
 import java.time.LocalDateTime;
@@ -18,10 +21,13 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 @Service
-public class InterviewServiceImpl implements InterviewService {
+public class InterviewServiceImpl implements InterviewService<Interview> {
 
     @Inject
     InterviewRepository interviewRepository;
+
+    @Inject
+    InterviewLogRepository interviewLogRepository;
 
     @Inject
     MongoTemplate mongoTemplate;
@@ -36,10 +42,25 @@ public class InterviewServiceImpl implements InterviewService {
     }
 
     @Override
-    public Optional<Interview> getInterviewById(String id) throws ServiceException {
+    public Optional<List<Interview>> getByInterviewId(String interviewerId) throws ServiceException {
+        try {
+            Criteria criteria = new Criteria();
+            criteria = criteria.where("interviewStatus").is(InterviewStatus.INITIATED)
+                    .orOperator(Criteria.where("interviewerId").is(interviewerId),
+                            Criteria.where("interviewerList").is(interviewerId) );
+
+            Query query = new Query(criteria);
+            return Optional.of(mongoTemplate.find(query,Interview.class));
+        } catch (DataAccessResourceFailureException | ServiceException e) {
+            throw new ServiceException(e.getMessage());
+        }
+    }
+
+    @Override
+    public Optional<Interview> getById(String id) throws ServiceException {
         try {
             return interviewRepository.findById(id);
-        } catch (DataAccessResourceFailureException | ServiceException e) {
+        }catch (DataAccessResourceFailureException | ServiceException e) {
             throw new ServiceException(e.getMessage());
         }
     }
@@ -47,14 +68,7 @@ public class InterviewServiceImpl implements InterviewService {
     @Override
     public void deleteInterview(String id) throws ServiceException {
         try {
-            Optional<Interview> interview = interviewRepository.findById(id);
-            if (interview.isPresent()) {
-                Interview interviewRec = interview.get();
-                interviewRec.setDeleted(true);
-                interviewRepository.save(interviewRec);
-            } else {
-                throw new ServiceException(InterviewConstant.INVALID_INTERVIEW);
-            }
+            interviewRepository.deleteById(id);
         } catch (DataAccessResourceFailureException | ServiceException e) {
             throw new ServiceException(e.getMessage());
         }
@@ -69,34 +83,108 @@ public class InterviewServiceImpl implements InterviewService {
         }
     }
 
+
+
+
+//    @Override
+//    public long getCandidateCount(String candidateId) throws ServiceException {
+//        try {
+//            Query query = new Query();
+//            query.addCriteria(Criteria.where("candidateId").is(candidateId)
+//                    .andOperator(Criteria.where("interviewStatus").is(InterviewStatus.ACKNOWLEDGED)));
+//            return mongoTemplate.count(query, Interview.class);
+//        } catch (DataAccessResourceFailureException | ServiceException e) {
+//            throw new ServiceException(e.getMessage());
+//        }
+//    }
+
     @Override
-    public long getCandidateCount(String candidateId) throws ServiceException {
+    public Optional addInterview(Interview interview) throws ServiceException {
         try {
-            Query query = new Query();
-            query.addCriteria(Criteria.where("candidateId").is(candidateId)
-                    .andOperator(Criteria.where("interviewStatus").is(InterviewStatus.ACKNOWLEDGED)));
-            return mongoTemplate.count(query, Interview.class);
+            return Optional.of(interviewRepository.save(interview));
+        } catch (DataAccessResourceFailureException | ServiceException e) {
+            throw new ServiceException(e.getMessage());
+        }
+    }
+
+//    @Override
+//    public Optional<Interview> getInterviewByCandidateId(String candidateId, String status) throws ServiceException {
+//        try {
+//            Query query = new Query();
+//            query.addCriteria(Criteria.where("candidateId").is(candidateId)
+//                    .andOperator(Criteria.where("interviewStatus").is(status))
+//                    );
+//            return Optional.of(mongoTemplate.findOne(query, Interview.class));
+//        } catch (DataAccessResourceFailureException | ServiceException e) {
+//            throw new ServiceException(e.getMessage());
+//        }
+//    }
+
+    @Loggable
+    @Override
+    public Optional<Interview> getAcknowledgedDetail(String interviewerId,String candidateId) throws ServiceException {
+        try {
+            Criteria criteria = new Criteria();
+            criteria = criteria.andOperator(Criteria.where("interviewerId").is(interviewerId),
+                                  Criteria.where("interviewStatus").is(InterviewStatus.ACKNOWLEDGED.toString()),
+                    Criteria.where("candidateId").is(candidateId));
+
+
+            Query query = new Query(criteria);
+        return Optional.of(mongoTemplate.findOne(query, Interview.class));
         } catch (DataAccessResourceFailureException | ServiceException e) {
             throw new ServiceException(e.getMessage());
         }
     }
 
     @Override
-    public Optional addInterview(String candidateId, String interviewId, String status) throws ServiceException {
+    public Optional<List<Interview>> getAcknowledgedByID(String interviewerId) throws ServiceException {
         try {
-            LocalDateTime joiningDate = LocalDateTime.now();
-            Interview interview = new Interview();
-            interview.setInterviewStatus(InterviewStatus.valueOf(status));
-            List interviewList = new ArrayList<String>();
-            interviewList.add(interviewId);
-            interview.setInterviewerId(interviewList);
-            interview.setModifiedDate(joiningDate);
-            interview.setCreationTime(joiningDate);
-            interview.setCandidateId(candidateId);
-            interview.setDeleted(false);
-            return Optional.of(interviewRepository.save(interview));
+            Criteria criteria = new Criteria();
+            criteria = criteria.andOperator(Criteria.where("interviewerId").is(interviewerId),
+                    Criteria.where("interviewStatus").is(InterviewStatus.ACKNOWLEDGED));
+            Query query = new Query(criteria);
+            return Optional.of(mongoTemplate.find(query, Interview.class));
         } catch (DataAccessResourceFailureException | ServiceException e) {
             throw new ServiceException(e.getMessage());
         }
     }
+
+    @Override
+    public Optional<List<Interviewlog>> getRejectedDetail(String interviewerId) throws ServiceException {
+        try {
+            Criteria criteria = new Criteria();
+            criteria = criteria.andOperator(Criteria.where("interviewerId").is(interviewerId),
+                    Criteria.where("interviewStatus").is(InterviewStatus.REJECTED));
+            Query query = new Query(criteria);
+            return Optional.of(mongoTemplate.find(query, Interviewlog.class));
+        } catch (DataAccessResourceFailureException | ServiceException e) {
+            throw new ServiceException(e.getMessage());
+        }
+    }
+
+    @Override
+    public Optional<List<Interviewlog>> getApprovedDetail(String interviewerId) throws ServiceException {
+        try {
+            Criteria criteria = new Criteria();
+            criteria = criteria.andOperator(Criteria.where("interviewerId").is(interviewerId),
+                    Criteria.where("interviewStatus").is(InterviewStatus.APPROVED));
+            Query query = new Query(criteria);
+            return Optional.of(mongoTemplate.find(query, Interviewlog.class));
+        } catch (DataAccessResourceFailureException | ServiceException e) {
+            throw new ServiceException(e.getMessage());
+        }
+    }
+
+
+    @Override
+    public Optional addInterviewLog(Interviewlog interviewlog) throws ServiceException {
+        try {
+            return Optional.of(interviewLogRepository.save(interviewlog));
+        } catch (DataAccessResourceFailureException | ServiceException e) {
+            throw new ServiceException(e.getMessage());
+        }
+    }
+
+
 }
