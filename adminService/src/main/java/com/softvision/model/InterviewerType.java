@@ -2,13 +2,14 @@ package com.softvision.model;
 
 
 public enum InterviewerType {
-    MANAGER,
-    INTERVIEWER,
-    ADMIN;
+    M,
+    I,
+    A,
+    R;
 
     @Override
     public String toString() {
-        return MANAGER+","+ INTERVIEWER + "," + ADMIN ;
+        return M+","+ I + "," + A + "," + R ;
     }
 }
 
