@@ -48,7 +48,7 @@ public class Candidate extends CommonEntity implements Serializable{
     private Boolean isActive;
 
     /** The experiance. */
-    private String experiance;
+    private String experience;
 
     /** The phone number. */
     @NotNull
