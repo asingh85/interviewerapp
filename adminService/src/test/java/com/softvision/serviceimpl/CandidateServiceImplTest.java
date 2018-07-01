@@ -1,6 +1,7 @@
 package com.softvision.serviceimpl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -10,6 +11,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -151,13 +154,16 @@ public class CandidateServiceImplTest {
 		assertEquals(candidateList.size(), 2);
 	}
 	
-	/*@Test
+	@Test
 	public void testFindByIsActiveIsTrue() {
-		Mockito.when(candidateRepository.findByIsActiveIsTrue()).thenReturn(candidates);
+		List<Candidate> candidateIsActiveList = new ArrayList<>();
+		candidateIsActiveList.add(candidate);
+		Mockito.when(candidateRepository.findByIsActiveIsTrue()).thenReturn(candidateIsActiveList);
 		List<Candidate> candidateList = candidateServiceImpl.findByIsActiveIsTrue();
 		assertEquals(candidateList.get(0).getIsActive(), true);
 		assertEquals(candidateList.size(), 1);
-	}*/
+		assertFalse(!candidateList.get(0).getIsActive());
+	}
 
 	@Test
 	public void testUpdateCandidate() {
@@ -187,7 +193,7 @@ public class CandidateServiceImplTest {
 
 		Query query = new Query(criteria);
 		Mockito.when(mongoTemplate.find(query, Candidate.class)).thenReturn(candidates);
-		List<Candidate> candidateList = candidateServiceImpl.searchCandidate("7766");
+		List<Candidate> candidateList = candidateServiceImpl.searchCandidate(searchAttribute);
 		assertEquals(candidateList.size(), 0);
 	}
 }
