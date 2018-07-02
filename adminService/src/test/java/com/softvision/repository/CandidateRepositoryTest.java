@@ -58,7 +58,7 @@ public class CandidateRepositoryTest {
 		candidate.setFirstName("Test");
 		candidate.setLastName("User");
 		candidate.setEmail("test@test.com");
-		candidate.setExperiance("7 years");
+		candidate.setExperience("7 years");
 		candidate.setGender("Male");
 		candidate.setIsActive(true);
 		candidate.setPhoneNumber("9986644333");
@@ -77,7 +77,7 @@ public class CandidateRepositoryTest {
 		candidate1.setFirstName("inactive-Test");
 		candidate1.setLastName("inactive-User");
 		candidate1.setEmail("inactive-test@test.com");
-		candidate1.setExperiance("1 years");
+		candidate1.setExperience("1 years");
 		candidate1.setGender("Male");
 		candidate1.setIsActive(false);
 		candidate1.setPhoneNumber("7788776654");
