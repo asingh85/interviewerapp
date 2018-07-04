@@ -6,6 +6,7 @@ import com.softvision.model.InterviewStatus;
 import com.softvision.model.Interviewlog;
 import com.softvision.service.InterviewService;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
 import org.springframework.stereotype.Component;
@@ -54,5 +55,9 @@ public class RejectedStatus {
 
     public Optional<Interviewlog> rejectedCount(String interviewId) throws ServiceException {
         return interviewService.getRejectedDetail(interviewId);
+    }
+
+    public Optional<List<Interviewlog>> getAllRejected() throws ServiceException {
+        return interviewService.getAllRejected();
     }
 }

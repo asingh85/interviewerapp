@@ -8,8 +8,18 @@ import com.softvision.mapper.ApprovedStatus;
 import com.softvision.mapper.InitialStatus;
 import com.softvision.mapper.NextRoundStatus;
 import com.softvision.mapper.RejectedStatus;
+import com.softvision.model.Interviewlog;
+import com.softvision.repository.InterviewLogRepository;
 import com.softvision.service.InterviewService;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -169,7 +179,7 @@ public class InterviewController {
     public void acknowledged(@Suspended AsyncResponse asyncResponse,
                              @QueryParam("id") String id,
                              @QueryParam("interviewerId") String interviewerId) {
-        if ((id != null && !id.isEmpty())&& (interviewerId!= null && !interviewerId.isEmpty())
+        if ((id != null && !id.isEmpty()) && (interviewerId != null && !interviewerId.isEmpty())
                 ) {
             CompletableFuture.supplyAsync(() -> {
                 return acknowledgedStatus.acknowledgedInterview(id, interviewerId);
@@ -209,14 +219,19 @@ public class InterviewController {
     @Produces(MediaType.APPLICATION_JSON)
     @Loggable
     public void approved(@Suspended AsyncResponse asyncResponse,
-                         @QueryParam("id") String id ,
+                         @QueryParam("id") String id,
                          @QueryParam("nextInterviewerId") String nextInterviewerId,
                          @QueryParam("interviewerType") String interviewerType) {
-            if ((id != null && !id.isEmpty())
-                    && (nextInterviewerId != null && !nextInterviewerId.isEmpty())
-                    && (interviewerType != null && !interviewerType.isEmpty())) {
+        if ((id != null && !id.isEmpty())
+                && (nextInterviewerId != null && !nextInterviewerId.isEmpty())
+                && (interviewerType != null && !interviewerType.isEmpty())) {
             CompletableFuture.supplyAsync(() -> {
-                return approvedStatus.approveCandidate(id,nextInterviewerId,interviewerType);
+                if (interviewerType.equalsIgnoreCase(InterviewConstant.MANAGER)) {
+                    return approvedStatus.managerApprove(id, nextInterviewerId);
+                } else {
+                    return approvedStatus.interviewerApprove(id, nextInterviewerId);
+                }
+
             }).thenApply(optional -> asyncResponse.resume(optional.get()))
                     .exceptionally(e -> asyncResponse.resume(
                             Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
@@ -224,6 +239,50 @@ public class InterviewController {
             asyncResponse.resume(
                     Response.status(Response.Status.BAD_REQUEST).entity(InterviewConstant.INVALID_REQUEST).build());
         }
+    }
+
+    @GET
+    @Path("/approvedall")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Loggable
+    public void approvedAll(@Suspended AsyncResponse asyncResponse) {
+        CompletableFuture.supplyAsync(() -> {
+                    List<Interviewlog> interLogList = approvedStatus.getAllApproved().get();
+                    Map<String, Interviewlog> map = interLogList.stream()
+                            .collect(HashMap<String, Interviewlog>::new,
+                                    (k, v) -> {
+                                        k.compute(v.getCandidateId(), (key, value) -> {
+                                            if (k.get(v.getCandidateId()) != null) {
+                                                if (v.getCreationTime().compareTo(value.getCreationTime()) == -1) {
+                                                    k.put(v.getCandidateId(), value);
+                                                }
+                                            } else {
+                                                k.put(v.getCandidateId(), v);
+                                            }
+                                            return v;
+                                        });
+                                    },
+                                    (k, v) -> k.putAll(v));
+                    return Optional.of(map.values());
+                }
+        ).thenApply(optional -> asyncResponse.resume(optional.get()))
+                .exceptionally(e -> asyncResponse.resume(
+                        Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
+    }
+
+    @GET
+    @Path("/rejectedall")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Loggable
+    public void rejectedAll(@Suspended AsyncResponse asyncResponse) {
+        CompletableFuture.supplyAsync(() -> {
+                    return rejectedStatus.getAllRejected();
+                }
+        ).thenApply(optional -> asyncResponse.resume(optional.get()))
+                .exceptionally(e -> asyncResponse.resume(
+                        Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
     }
 
     @GET
@@ -237,7 +296,7 @@ public class InterviewController {
         if ((id != null && !id.isEmpty())
                 && (nextInterviewId != null && !nextInterviewId.isEmpty())) {
             CompletableFuture.supplyAsync(() -> {
-                return nextRoundStatus.moveToNextInterview(id,nextInterviewId);
+                return nextRoundStatus.moveToNextInterview(id, nextInterviewId);
             }).thenApply(optional -> asyncResponse.resume(optional.get()))
                     .exceptionally(e -> asyncResponse.resume(
                             Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
@@ -304,6 +363,5 @@ public class InterviewController {
             }
 
         });
-
     }
 }

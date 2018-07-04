@@ -1,16 +1,13 @@
 package com.softvision.serviceimpl;
 
-import com.softvision.constant.InterviewConstant;
+import com.softvision.exception.ServiceException;
 import com.softvision.helper.Loggable;
 import com.softvision.model.Interview;
 import com.softvision.model.InterviewStatus;
-import com.softvision.exception.ServiceException;
 import com.softvision.model.Interviewlog;
 import com.softvision.repository.InterviewLogRepository;
 import com.softvision.repository.InterviewRepository;
 import com.softvision.service.InterviewService;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -83,21 +80,6 @@ public class InterviewServiceImpl implements InterviewService<Interview> {
         }
     }
 
-
-
-
-//    @Override
-//    public long getCandidateCount(String candidateId) throws ServiceException {
-//        try {
-//            Query query = new Query();
-//            query.addCriteria(Criteria.where("candidateId").is(candidateId)
-//                    .andOperator(Criteria.where("interviewStatus").is(InterviewStatus.ACKNOWLEDGED)));
-//            return mongoTemplate.count(query, Interview.class);
-//        } catch (DataAccessResourceFailureException | ServiceException e) {
-//            throw new ServiceException(e.getMessage());
-//        }
-//    }
-
     @Override
     public Optional addInterview(Interview interview) throws ServiceException {
         try {
@@ -106,19 +88,6 @@ public class InterviewServiceImpl implements InterviewService<Interview> {
             throw new ServiceException(e.getMessage());
         }
     }
-
-//    @Override
-//    public Optional<Interview> getInterviewByCandidateId(String candidateId, String status) throws ServiceException {
-//        try {
-//            Query query = new Query();
-//            query.addCriteria(Criteria.where("candidateId").is(candidateId)
-//                    .andOperator(Criteria.where("interviewStatus").is(status))
-//                    );
-//            return Optional.of(mongoTemplate.findOne(query, Interview.class));
-//        } catch (DataAccessResourceFailureException | ServiceException e) {
-//            throw new ServiceException(e.getMessage());
-//        }
-//    }
 
     @Loggable
     @Override
@@ -176,6 +145,29 @@ public class InterviewServiceImpl implements InterviewService<Interview> {
         }
     }
 
+    @Override
+    public Optional<List<Interviewlog>> getAllApproved() throws ServiceException {
+        try {
+            Criteria criteria = new Criteria();
+            criteria = Criteria.where("interviewStatus").is(InterviewStatus.APPROVED);
+            Query query = new Query(criteria);
+            return Optional.of(mongoTemplate.find(query, Interviewlog.class));
+        } catch (DataAccessResourceFailureException | ServiceException e) {
+            throw new ServiceException(e.getMessage());
+        }
+    }
+
+    @Override
+    public Optional<List<Interviewlog>> getAllRejected() throws ServiceException {
+        try {
+            Criteria criteria = new Criteria();
+            criteria = Criteria.where("interviewStatus").is(InterviewStatus.REJECTED);
+            Query query = new Query(criteria);
+            return Optional.of(mongoTemplate.find(query, Interviewlog.class));
+        } catch (DataAccessResourceFailureException | ServiceException e) {
+            throw new ServiceException(e.getMessage());
+        }
+    }
 
     @Override
     public Optional addInterviewLog(Interviewlog interviewlog) throws ServiceException {
