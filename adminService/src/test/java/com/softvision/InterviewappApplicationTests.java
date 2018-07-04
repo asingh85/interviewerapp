@@ -17,14 +17,15 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 public class InterviewappApplicationTests {
 
-//    @Autowired
-//    CandidateRepository repository;
-//    private Candidate candidate;
-//    private Candidate candidate1;
-//    private Candidate insertedCandidate;
-//    private Candidate inactiveCandidate;
+    @Autowired
+    CandidateRepository repository;
+    private Candidate candidate;
+    private Candidate candidate1;
+    private Candidate insertedCandidate;
+    private Candidate inactiveCandidate;
 
     /**
+     *
      * setUp
      * InterviewappApplicationTests
      * void
@@ -69,6 +70,7 @@ public class InterviewappApplicationTests {
 
 		inactiveCandidate = repository.save(candidate1);
 	}*/
+
     @Test
     public void contextLoads() {
 
@@ -80,7 +82,6 @@ public class InterviewappApplicationTests {
 		assertThat(insertedCandidate.getFirstName(), is(equalTo(candidate.getFirstName())));
 		assertEquals(insertedCandidate.getUniqueIdentityNumber(), candidate.getUniqueIdentityNumber());
 	}
-
 
 	@Test
 	public void testRepositoryFindById() {

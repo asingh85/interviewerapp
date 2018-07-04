@@ -3,7 +3,18 @@
  */
 package com.softvision.repository;
 
-import com.softvision.model.Candidate;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,16 +24,11 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import com.softvision.model.Candidate;
 
 /**
  * @author durga.s
+ *
  */
 
 @RunWith(SpringRunner.class)
@@ -40,6 +46,7 @@ public class CandidateRepositoryTest {
     private Candidate inactiveCandidate;
 
     /**
+     *
      * setUp
      * InterviewappApplicationTests
      * void
@@ -109,7 +116,7 @@ public class CandidateRepositoryTest {
     @Test
     public void testRepositoryFindAll() {
         List<Candidate> candidates = repository.findAll();
-        assertTrue(candidates.size() == 2);
+        assertTrue(candidates.size()==2);
     }
 
     @Test
@@ -128,6 +135,7 @@ public class CandidateRepositoryTest {
         Optional<Candidate> deletedCandidate = repository.findById("1");
         assertFalse(deletedCandidate.isPresent());
     }
+
 
 
 }
