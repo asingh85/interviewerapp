@@ -11,7 +11,7 @@ public enum TechnologyCommunity {
 
     @Override
     public String toString() {
-        return JAVA+","+ UI + "," + QA + "," + MAINFRAME + "," + DOTNET + "," + COMMUNITYHEAD;
+        return JAVA + "," + UI + "," + QA + "," + MAINFRAME + "," + DOTNET + "," + COMMUNITYHEAD;
     }
 }
 

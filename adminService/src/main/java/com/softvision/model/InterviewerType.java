@@ -9,7 +9,7 @@ public enum InterviewerType {
 
     @Override
     public String toString() {
-        return M+","+ I + "," + A + "," + R ;
+        return M + "," + I + "," + A + "," + R;
     }
 }
 

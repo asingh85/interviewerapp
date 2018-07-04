@@ -1,17 +1,15 @@
 package com.softvision.model;
 
-import java.io.File;
-import java.io.Serializable;
-import java.nio.file.Files;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import javax.persistence.Convert;
-import javax.validation.constraints.NotNull;
+import com.softvision.helper.LocalDateTimeAttributeConverter;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import com.softvision.helper.LocalDateTimeAttributeConverter;
+
+import javax.persistence.Convert;
+import javax.validation.constraints.NotNull;
+import java.io.File;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 
 /**
@@ -22,53 +20,77 @@ import com.softvision.helper.LocalDateTimeAttributeConverter;
 
 @Document(collection = "candidate")
 @Data
-public class Candidate extends CommonEntity implements Serializable{
+public class Candidate extends CommonEntity implements Serializable {
 
-    /** The Constant serialVersionUID. */
+    /**
+     * The Constant serialVersionUID.
+     */
     private static final long serialVersionUID = 1L;
 
-    /** The id. */
+    /**
+     * The id.
+     */
     @Id
     private String candidateId;
 
-    /** The first name. */
+    /**
+     * The first name.
+     */
     @NotNull
     private String firstName;
 
-    /** The last name. */
+    /**
+     * The last name.
+     */
     private String lastName;
 
-    /** The gender. */
+    /**
+     * The gender.
+     */
     private String gender;
 
-    /** The technology stack. */
+    /**
+     * The technology stack.
+     */
     private String technologyStack;
 
-    /** The is active. */
+    /**
+     * The is active.
+     */
     private Boolean isActive;
 
-    /** The experiance. */
+    /**
+     * The experiance.
+     */
     private String experience;
 
-    /** The phone number. */
+    /**
+     * The phone number.
+     */
     @NotNull
     private String phoneNumber;
 
-    /** The email. */
+    /**
+     * The email.
+     */
     @NotNull
     private String email;
 
-    /** The unique identity number. */
+    /**
+     * The unique identity number.
+     */
     private String uniqueIdentityNumber;
 
-    /** The resume */
+    /**
+     * The resume
+     */
     private File resume;
-    
-    
+
+
     @Convert(converter = LocalDateTimeAttributeConverter.class)
     private LocalDateTime interviewDate;
-    
-    
+
+
     @Convert(converter = LocalDateTimeAttributeConverter.class)
     private LocalDateTime interviewTime;
 

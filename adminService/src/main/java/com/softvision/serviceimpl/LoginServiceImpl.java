@@ -1,16 +1,14 @@
 package com.softvision.serviceimpl;
 
-import javax.inject.Inject;
-
+import com.softvision.model.Login;
 import com.softvision.repository.LoginRepository;
+import com.softvision.service.LoginService;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
-import com.softvision.model.Login;
-import com.softvision.service.LoginService;
-
+import javax.inject.Inject;
 import java.util.List;
 
 
@@ -40,13 +38,13 @@ public class LoginServiceImpl implements LoginService<Login> {
         System.out.println(query.toString());
         System.out.println(mongoTemplate.getDb().getCollection("login").count());
         System.out.println("All docs : " + mongoTemplate.findAll(Login.class));
-        System.out.println("All docs : " + mongoTemplate.findOne(query,Login.class));
-        return mongoTemplate.findOne(query,Login.class);
+        System.out.println("All docs : " + mongoTemplate.findOne(query, Login.class));
+        return mongoTemplate.findOne(query, Login.class);
     }
 
     @Override
     public List<Login> getAll() {
-       return loginRepository.findAll();
+        return loginRepository.findAll();
     }
 
 }

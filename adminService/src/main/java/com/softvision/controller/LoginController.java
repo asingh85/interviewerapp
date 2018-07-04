@@ -12,7 +12,6 @@ import javax.ws.rs.core.Response;
 import java.util.concurrent.CompletableFuture;
 
 
-
 @Path("/login")
 public class LoginController {
 
@@ -23,7 +22,7 @@ public class LoginController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public void registerUsers(@Suspended AsyncResponse asyncResponse,
-                             Login login) {
+                              Login login) {
 
         asyncResponse.resume(loginService.register(login));
     }
@@ -32,9 +31,9 @@ public class LoginController {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public void loginValidate(@Suspended AsyncResponse asyncResponse,
-                             @QueryParam("name") String name, @QueryParam("pass") String pass) {
+                              @QueryParam("name") String name, @QueryParam("pass") String pass) {
 
-        CompletableFuture.supplyAsync(() -> loginService.login(name,pass))
+        CompletableFuture.supplyAsync(() -> loginService.login(name, pass))
                 .thenApply(v -> asyncResponse.resume(v))
                 .exceptionally(v -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(v.getMessage()).build()));
 

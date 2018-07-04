@@ -1,10 +1,10 @@
 package com.softvision.validation;
 
-import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
+import java.util.Set;
 
 public class ValidationUtil {
     private static final Validator VALIDATOR = Validation.buildDefaultValidatorFactory().getValidator();
