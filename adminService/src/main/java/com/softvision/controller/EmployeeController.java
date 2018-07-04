@@ -113,11 +113,17 @@ public class EmployeeController {
         LOGGER.info("Number of elements request is {} and sort order is {} and isDeleted {} ", size, sortOrder, isDeleted);
         if (StringUtils.isEmpty(sortOrder) && size < 1) {
             asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Number of elements request should not be 0 and sort order should be given").build());
+        } else if (!isDeleted) {
+            CompletableFuture.supplyAsync(() -> employeeService.getAllEmployees())
+                    .thenApply(v -> (List<Employee>) v.get())
+                    .thenApply(k -> asyncResponse.resume(k.stream().sorted().filter(p -> !p.isDeleted() && p.getEmployeeType().equals(EmployeeType.RECRUITER)).collect(Collectors.toList())))
+                    .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
+        } else {
+            CompletableFuture.supplyAsync(() -> employeeService.getAllEmployees())
+                    .thenApply(v -> (List<Employee>) v.get())
+                    .thenApply(k -> asyncResponse.resume(k.stream().sorted().filter(p -> p.isDeleted() && p.getEmployeeType().equals(EmployeeType.RECRUITER)).collect(Collectors.toList())))
+                    .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
         }
-        CompletableFuture.supplyAsync(() -> employeeService.getAllEmployees())
-                .thenApply(v -> (List<Employee>) v.get())
-                .thenApply(k -> asyncResponse.resume(k.stream().sorted().filter(p -> p.getEmployeeType().equals(EmployeeType.RECRUITER)).collect(Collectors.toList())))
-                .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
     }
 
     @GET
@@ -133,11 +139,17 @@ public class EmployeeController {
         LOGGER.info("Number of elements request is {} and sort order is {} and isDeleted {} ", size, sortOrder, isDeleted);
         if (StringUtils.isEmpty(sortOrder) && size < 1) {
             asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Number of elements request should not be 0 and sort order should be given").build());
+        } else if (!isDeleted) {
+            CompletableFuture.supplyAsync(() -> employeeService.getAllEmployees())
+                    .thenApply(v -> (List<Employee>) v.get())
+                    .thenApply(k -> asyncResponse.resume(k.stream().sorted().filter(p -> !p.isDeleted() && p.getEmployeeType().equals(EmployeeType.INTERVIEWER)).collect(Collectors.toList())))
+                    .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
+        } else {
+            CompletableFuture.supplyAsync(() -> employeeService.getAllEmployees())
+                    .thenApply(v -> (List<Employee>) v.get())
+                    .thenApply(k -> asyncResponse.resume(k.stream().sorted().filter(p -> p.isDeleted() && p.getEmployeeType().equals(EmployeeType.INTERVIEWER)).collect(Collectors.toList())))
+                    .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
         }
-        CompletableFuture.supplyAsync(() -> employeeService.getAllEmployees())
-                .thenApply(v -> (List<Employee>) v.get())
-                .thenApply(k -> asyncResponse.resume(k.stream().sorted().filter(p -> p.getEmployeeType().equals(EmployeeType.INTERVIEWER)).collect(Collectors.toList())))
-                .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
     }
 
 
