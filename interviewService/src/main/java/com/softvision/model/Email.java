@@ -37,6 +37,9 @@ public class Email implements Serializable{
 	/** The reply to. */
 	private String replyTo;
 	
+	/** The template name. */
+	private String templateName;
+	
 	
 	
 	

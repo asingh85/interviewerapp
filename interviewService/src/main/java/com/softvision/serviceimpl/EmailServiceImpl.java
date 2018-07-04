@@ -106,7 +106,7 @@ public class EmailServiceImpl implements EmailService {
 			}
 			mimeMessageHelper.setSubject(email.getSubject());
 
-			String mergedEmailBody = getMergedEmailBodyWithTemplate(email.getBody());
+			String mergedEmailBody = getMergedEmailBodyWithTemplate(email.getBody(), email.getTemplateName());
 
 			mimeMessageHelper.setText(mergedEmailBody, true);
 			javaMailSender.send(mimeMessage);
@@ -125,16 +125,17 @@ public class EmailServiceImpl implements EmailService {
 	 *
 	 * @param body
 	 *            the body
+	 * @param templateName
 	 * @return the merged email body with template
 	 */
-	private String getMergedEmailBodyWithTemplate(final JSONObject body) {
+	private String getMergedEmailBodyWithTemplate(final JSONObject body, String templateName) {
 
 		Context contextForBody = new Context();
 		String mergedBody = null;
 		try {
 			contextForBody = getDataForTemplateMerge(body.toJSONString());
 
-			String templateBody = getTemplateContentFromFile();
+			String templateBody = getTemplateContentFromFile(templateName);
 
 			mergedBody = getMergedBodyWithTemplate(templateBody, contextForBody);
 
@@ -152,16 +153,18 @@ public class EmailServiceImpl implements EmailService {
 
 	/**
 	 * Gets the template content from file.
+	 * 
+	 * @param templateName
 	 *
 	 * @return the template content from file
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	private String getTemplateContentFromFile() throws IOException {
+	private String getTemplateContentFromFile(String templateName) throws IOException {
 		ClassLoader classLoader = getClass().getClassLoader();
 
-		String templateContent = IOUtils
-				.toString(classLoader.getResourceAsStream(ServiceConstants.INTERVIEW_TEMPLATE_HTML));
+		String templateContent = IOUtils.toString(classLoader.getResourceAsStream(ServiceConstants.TEMPLATES_FOLDER
+				+ ServiceConstants.BACK_SLASH + templateName + ServiceConstants.DOT + ServiceConstants.HTML));
 
 		return templateContent;
 	}

@@ -94,17 +94,24 @@ public class ServiceConstants {
 	/** The Constant SENDING_EMAIL_TO. */
 	public static final String SENDING_EMAIL_TO = "sending email to";
 	
+	/** The Constant PROPERTY_FROM_ADDRESS. */
 	public static final String PROPERTY_FROM_ADDRESS = "email.service.from.address";
 	
+	/** The Constant ZERO. */
 	public static final int ZERO = 0;
 	
+	/** The Constant EXCEPTION_IN_SENDING_MAIL. */
 	public static final String EXCEPTION_IN_SENDING_MAIL = "Exception in Sending mail";
 	
+	/** The Constant FAILED_TO_GET_TEMPLATE_FILE. */
 	public static final String FAILED_TO_GET_TEMPLATE_FILE = "Failed to get the Template file";
 	
+	/** The Constant FAILED_TO_MERGE. */
 	public static final String FAILED_TO_MERGE = "Failed to Merge";
 	
-	public static final String INTERVIEW_TEMPLATE_HTML = "interviewTemplate.html";
-	
+	/** The Constant JSON_ARRAY_PARSING_FAILED. */
 	public static final String JSON_ARRAY_PARSING_FAILED = "Json Array parsing failed in getDataForTemplateMerge() method";
+	
+	/** The Constant TEMPLATES_FOLDER. */
+	public static final String TEMPLATES_FOLDER = "templates";
 }
