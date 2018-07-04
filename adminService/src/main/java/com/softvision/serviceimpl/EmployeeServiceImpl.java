@@ -2,6 +2,7 @@ package com.softvision.serviceimpl;
 
 import com.softvision.model.Employee;
 import com.softvision.model.EmployeeType;
+import com.softvision.model.InterviewerType;
 import com.softvision.model.TechnologyCommunity;
 import com.softvision.repository.EmployeeRepository;
 import com.softvision.service.EmployeeService;
@@ -202,5 +203,18 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
     public Optional<List<EmployeeType>> getEmployeeType() {
         List<EmployeeType> list = Arrays.asList(EmployeeType.values());
         return Optional.of(list);
+    }
+
+    @Override
+    public Optional<List<Employee>> getInterviewerByType(String technicalCommunity, String interviewerType) {
+        Query query = new Query();
+        Criteria criteria = new Criteria();
+        criteria.andOperator(
+                Criteria.where("technologyCommunity").is(TechnologyCommunity.valueOf(technicalCommunity)),
+                Criteria.where("interviewerType").is(InterviewerType.valueOf(interviewerType)));
+        query.addCriteria(criteria);
+        List<Employee> employees = mongoTemplate.find(query, Employee.class);
+        LOGGER.info("Interviewers information {} :", employees);
+        return Optional.of(employees);
     }
 }

@@ -23,7 +23,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-@Path(ServiceConstants.BACK_SLASH + ServiceConstants.EMPLOYEE)
+@Path("/")
 public class EmployeeController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeController.class);
@@ -31,8 +31,20 @@ public class EmployeeController {
     @Inject
     EmployeeService employeeService;
 
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Loggable
+    public void addEmployee(@Suspended AsyncResponse asyncResponse,
+                            Employee employee) {
+        ValidationUtil.validate(employee);
+        CompletableFuture.supplyAsync(() -> employeeService.addEmployee(employee))
+                .thenApply(optional -> asyncResponse.resume(optional.get()))
+                .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build()));
+    }
+
     @GET
-    @Path(ServiceConstants.BACK_SLASH + ServiceConstants.OPENING_CURLY_BRACKET + ServiceConstants.ID + ServiceConstants.CLOSING_CURLY_BRACKET)
+    @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @Loggable
     public void getEmployeeById(@Suspended AsyncResponse asyncResponse,
@@ -48,7 +60,7 @@ public class EmployeeController {
     }
 
     @GET
-    @Path(ServiceConstants.BACK_SLASH + ServiceConstants.SEARCH)
+    @Path("/search")
     @Produces(MediaType.APPLICATION_JSON)
     @Loggable
     public void search(@Suspended AsyncResponse asyncResponse,
@@ -64,7 +76,6 @@ public class EmployeeController {
     }
 
     @GET
-    @Path(ServiceConstants.BACK_SLASH + ServiceConstants.ALLEMPLOYEE)
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Loggable
@@ -90,7 +101,7 @@ public class EmployeeController {
     }
 
     @GET
-    @Path(ServiceConstants.BACK_SLASH + ServiceConstants.RECRUITER)
+    @Path("/recruiter")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Loggable
@@ -110,7 +121,7 @@ public class EmployeeController {
     }
 
     @GET
-    @Path(ServiceConstants.BACK_SLASH + ServiceConstants.INTERVIEWER)
+    @Path("/interviewer")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Loggable
@@ -130,20 +141,8 @@ public class EmployeeController {
     }
 
 
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Loggable
-    public void addEmployee(@Suspended AsyncResponse asyncResponse,
-                            Employee employee) {
-        ValidationUtil.validate(employee);
-        CompletableFuture.supplyAsync(() -> employeeService.addEmployee(employee))
-                .thenApply(optional -> asyncResponse.resume(optional.get()))
-                .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build()));
-    }
-
     @PUT
-    @Path(ServiceConstants.BACK_SLASH + ServiceConstants.OPENING_CURLY_BRACKET + ServiceConstants.ID + ServiceConstants.CLOSING_CURLY_BRACKET)
+    @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Loggable
@@ -160,12 +159,12 @@ public class EmployeeController {
     }
 
     @DELETE
-    @Path(ServiceConstants.BACK_SLASH + ServiceConstants.OPENING_CURLY_BRACKET + ServiceConstants.ID + ServiceConstants.CLOSING_CURLY_BRACKET)
+    @Path("/{id}")
     @Loggable
     public void deleteEmployee(@Suspended AsyncResponse asyncResponse,
                                @PathParam("id") String id) {
 
-        LOGGER.info("Deleting candidate {} ", id);
+        LOGGER.info("Deleting employee {} ", id);
         CompletableFuture future = CompletableFuture.runAsync(() -> employeeService.deleteEmployee(id));
         asyncResponse.resume(future.join());
     }
@@ -173,7 +172,7 @@ public class EmployeeController {
     @DELETE
     @Loggable
     public void deleteAllEmployees(@Suspended AsyncResponse asyncResponse) {
-        LOGGER.info(" Deleting All candidates ");
+        LOGGER.info(" Deleting All employee ");
 
         CompletableFuture future = CompletableFuture.runAsync(() -> employeeService.deleteAllEmployees());
         Response.ResponseBuilder rb = Response.ok("the test response");
@@ -183,7 +182,7 @@ public class EmployeeController {
     }
 
     @GET
-    @Path(ServiceConstants.BACK_SLASH + ServiceConstants.BYBANDEXP)
+    @Path("/interviewer/bybandexp")
     @Produces(MediaType.APPLICATION_JSON)
     @Loggable
     public void getAllEmployeesByBandExp(@Suspended AsyncResponse asyncResponse,
@@ -205,7 +204,7 @@ public class EmployeeController {
     }
 
     @GET
-    @Path(ServiceConstants.BACK_SLASH + ServiceConstants.TECH)
+    @Path("/interviewer/tech")
     @Produces(MediaType.APPLICATION_JSON)
     @Loggable
     public void getTechStack(@Suspended AsyncResponse asyncResponse) {
@@ -217,7 +216,7 @@ public class EmployeeController {
     }
 
     @GET
-    @Path(ServiceConstants.BACK_SLASH + ServiceConstants.EMPLOYEE_TYPE)
+    @Path("/interviewer/employeetype")
     @Produces(MediaType.APPLICATION_JSON)
     @Loggable
     public void getEmployeeByType(@Suspended AsyncResponse asyncResponse) {
@@ -227,4 +226,20 @@ public class EmployeeController {
                 .sorted()
                 .collect(Collectors.toList()));
     }
+
+    @GET
+    @Path("/interviewer/interviewertype")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Loggable
+    public void getInterviewerByType(@Suspended AsyncResponse asyncResponse,
+                                     @QueryParam("tc") String technologyCommunity,
+                                     @QueryParam("it") String interviewerType) {
+        CompletableFuture<Optional<List<EmployeeType>>> future = CompletableFuture
+                .supplyAsync(() -> employeeService.getInterviewerByType(technologyCommunity, interviewerType));
+        asyncResponse.resume(future.join().get().stream()
+                .sorted()
+                .collect(Collectors.toList()));
+    }
+
+
 }
