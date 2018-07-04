@@ -3,6 +3,7 @@ package com.softvision.service;
 import com.softvision.model.Interview;
 import com.softvision.exception.ServiceException;
 import com.softvision.model.Interviewlog;
+import java.time.temporal.TemporalAmount;
 import java.util.List;
 import java.util.Optional;
 import javax.swing.text.html.Option;
@@ -35,4 +36,7 @@ public interface InterviewService<T> {
 
     Optional<List<Interviewlog>> getApprovedDetail(String interviewerId) throws ServiceException;
 
-  }
+    Optional<List<Interviewlog>> getAllApproved()throws ServiceException;
+
+    Optional<List<Interviewlog>> getAllRejected()throws ServiceException;
+}

@@ -12,55 +12,50 @@ import java.util.Optional;
 import javax.inject.Inject;
 import org.springframework.stereotype.Component;
 
+
 @Component
 public class AcknowledgedStatus {
 
     @Inject
     InterviewService interviewService;
 
+    public Optional<Interviewlog> acknowledgedInterview(String id, String interviewerId) {
+        Optional<Interview> interviewObj = interviewService.getById(id);
+        if (interviewObj.isPresent()) {
+            Interview interview = interviewObj.get();
+            LocalDateTime joiningDate = LocalDateTime.now();
 
-    public Optional<Interviewlog> acknowledgedInterview(String id, String interviewerId)  {
+            // move int to previous log
+            Interviewlog intLogInterview = new Interviewlog();
+            intLogInterview.setInterviewStatus(interview.getInterviewStatus());
+            intLogInterview.setCandidateId(interview.getCandidateId());
+            intLogInterview.setInterviewerId(interview.getInterviewerId());
+            intLogInterview.setModifiedDate(interview.getModifiedDate());
+            intLogInterview.setCreationTime(interview.getCreationTime());
+            intLogInterview.setInterviewId(interview.getId());
+            intLogInterview.setTechnology(interview.getTechnology());
+            intLogInterview.setInterviewerList(interview.getInterviewerList());
+            interviewService.addInterviewLog(intLogInterview);
 
-            Optional<Interview> interviewObj=interviewService.getById(id);
-            if(interviewObj.isPresent()){
-                Interview interview =  interviewObj.get();
-                LocalDateTime joiningDate = LocalDateTime.now();
+            interviewService.deleteInterview(interview.getId());
 
-                // move int to previous log
-                Interviewlog intLogInterview = new Interviewlog();
-                intLogInterview.setInterviewStatus(interview.getInterviewStatus());
-                intLogInterview.setCandidateId(interview.getCandidateId());
-                intLogInterview.setInterviewerId(interview.getInterviewerId());
-                intLogInterview.setModifiedDate(interview.getModifiedDate());
-                intLogInterview.setCreationTime(interview.getCreationTime());
-                intLogInterview.setInterviewId(interview.getId());
-                intLogInterview.setTechnology(interview.getTechnology());
-                intLogInterview.setInterviewerList(interview.getInterviewerList());
-                interviewService.addInterviewLog(intLogInterview);
-
-                interviewService.deleteInterview(interview.getId());
-
-                Interview ackInterview = new Interview();
-                ackInterview.setInterviewStatus(InterviewStatus.ACKNOWLEDGED);
-                ackInterview.setCandidateId(interview.getCandidateId());
-                ackInterview.setInterviewerId(interviewerId);
-                ackInterview.setModifiedDate(joiningDate);
-                ackInterview.setCreationTime(joiningDate);
-                ackInterview.setTechnology(interview.getTechnology());
-                ackInterview.setInterviewerList(null);
-                return  interviewService.addInterview(ackInterview);
-
-            }else{
-                throw  new ServiceException(InterviewConstant.CANDIDATE_ACK);
-            }
-
+            Interview ackInterview = new Interview();
+            ackInterview.setInterviewStatus(InterviewStatus.ACKNOWLEDGED);
+            ackInterview.setCandidateId(interview.getCandidateId());
+            ackInterview.setInterviewerId(interviewerId);
+            ackInterview.setModifiedDate(joiningDate);
+            ackInterview.setCreationTime(joiningDate);
+            ackInterview.setTechnology(interview.getTechnology());
+            ackInterview.setInterviewerList(null);
+            return interviewService.addInterview(ackInterview);
+        } else {
+            throw new ServiceException(InterviewConstant.CANDIDATE_ACK);
+        }
     }
 
-
-    public Optional<List<Interview>> getAcknowledgedByID(String interviewerId){
+    public Optional<List<Interview>> getAcknowledgedByID(String interviewerId) {
         return interviewService.getAcknowledgedByID(interviewerId);
     }
-
 }
 
 

@@ -31,6 +31,10 @@ public class Interview  {
     @NotNull
     private String technology;
 
+    private String comments;
+
+    private String recruiterId;
+
     @NotNull
     @Convert(converter = LocalDateTimeAttributeConverter.class)
     private LocalDateTime creationTime;
