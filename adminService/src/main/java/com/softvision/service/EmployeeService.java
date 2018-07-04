@@ -85,4 +85,6 @@ public interface EmployeeService<T extends Employee> {
      * @return EmployeeType
      */
     Optional<List<EmployeeType>> getEmployeeType();
+
+    Optional<List<Employee>> getInterviewerByType(String technicalCommunity, String interviewerType);
 }

@@ -81,17 +81,21 @@ public class Candidate extends CommonEntity implements Serializable {
      */
     private String uniqueIdentityNumber;
 
-<<<<<<< HEAD
+
     /**
      * The resume
      */
-=======
-    /** The interviewObjectID. */
+
+    /**
+     * The interviewObjectID.
+     */
     private String interviewObjectID;
 
 
-    /** The resume */
->>>>>>> 2ec7ec238ea40dcb535f75a11a7b1fd554a0b59e
+    /**
+     * The resume
+     */
+
     private File resume;
 
 
