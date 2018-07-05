@@ -52,12 +52,7 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
         return Optional.of(employees);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * com.softvision.service.EmployeeService #getEmployeeById()
-     */
+
     @Override
     public Optional<Employee> getEmployeeById(String id) {
         LOGGER.info("InterviewerServiceImpl ID is : {} ", id);
@@ -100,12 +95,6 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
         return mongoTemplate.find(query, Employee.class);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * com.softvision.service.EmployeeService #addEmployee()
-     */
     @Override
     public Optional<Employee> addEmployee(Employee employee) {
         LOGGER.info(" Entered into addEmployee() ");
@@ -116,12 +105,7 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
         return Optional.of(employeeRepository.insert(employee));
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * com.softvision.service.EmployeeService #updateEmployee()
-     */
+
     @Override
     public Optional<Employee> updateEmployee(Employee employee, String id) {
         LOGGER.info("EmployeeServiceImpl updateEmployee()  ID is :{}", id);
@@ -136,12 +120,7 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
         return Optional.of(employeeRepository.save(employee));
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * com.softvision.service.EmployeeService #deleteEmployee(java.lang.String)
-     */
+
     @Override
     public Optional<Employee> deleteEmployee(String id) {
         LOGGER.info("EmployeeServiceImpl deleteInterviewer()  ID is :{}", id);
@@ -160,12 +139,7 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
         return returnEmployee;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * com.softvision.service.EmployeeService #deleteAllEmployees()
-     */
+
     @Override
     public void deleteAllEmployees() {
         LOGGER.info("EmployeeServiceImpl entered into deleteAllRecruiter()  ");
@@ -176,12 +150,7 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
 
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * com.softvision.service.EmployeeService #getAllEmployeesByBandExp()
-     */
+
     @Override
     public Optional<List<Employee>> getAllEmployeesByBandExp(int expInmonths, String technicalCommunity) {
         Query query = new Query();
@@ -195,12 +164,7 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
         return Optional.of(employees);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * com.softvision.service.EmployeeService #getTechStack()
-     */
+
     @Override
     public Optional<List<TechnologyCommunity>> getTechStack() {
         List<TechnologyCommunity> list = Arrays.asList(TechnologyCommunity.values());
@@ -208,12 +172,6 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
     }
 
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * com.softvision.service.EmployeeService #getEmployeeType()
-     */
     @Override
     public Optional<List<EmployeeType>> getEmployeeType() {
         List<EmployeeType> list = Arrays.asList(EmployeeType.values());
