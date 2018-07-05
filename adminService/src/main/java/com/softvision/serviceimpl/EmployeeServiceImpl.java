@@ -1,5 +1,7 @@
 package com.softvision.serviceimpl;
 
+import com.softvision.common.ServiceConstants;
+import com.softvision.exception.EmployeeNotFoundException;
 import com.softvision.model.Employee;
 import com.softvision.model.EmployeeType;
 import com.softvision.model.InterviewerType;
@@ -30,25 +32,24 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
     MongoTemplate mongoTemplate;
 
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * com.softvision.service.EmployeeService #getAllEmployees()
-     */
-    @Override
-    public Optional<List<Employee>> getAllEmployees() {
-        return Optional.of(employeeRepository.findAll());
-    }
-
     @Override
     public Optional<List<Employee>> getAllRecruiters() {
-        return Optional.of(employeeRepository.findAll());
+        Criteria criteria = new Criteria();
+        criteria.andOperator(Criteria.where("employeeType").is(EmployeeType.R),
+                Criteria.where("isDeleted").is("N"));
+        Query query = new Query(criteria);
+        List<Employee> employees = mongoTemplate.find(query, Employee.class);
+        return Optional.of(employees);
     }
 
     @Override
     public Optional<List<Employee>> getAllInterviewers() {
-        return Optional.of(employeeRepository.findAll());
+        Criteria criteria = new Criteria();
+        criteria.andOperator(Criteria.where("employeeType").is(EmployeeType.I),
+                Criteria.where("isDeleted").is("N"));
+        Query query = new Query(criteria);
+        List<Employee> employees = mongoTemplate.find(query, Employee.class);
+        return Optional.of(employees);
     }
 
     /*
@@ -63,27 +64,38 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
         return Optional.of(employeeRepository.findById(id).get());
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * com.softvision.service.EmployeeService #search()
-     */
-    @Override
-    public List<Employee> search(String str) {
-        LOGGER.info(" Search string is : {} ", str);
-        StringBuilder covertStr = new StringBuilder();
-        covertStr.append("/").append(str).append("/");
-        Criteria criteria = new Criteria();
-        criteria = criteria.orOperator(
-                Criteria.where("firstName").regex(str, "si")
-                , Criteria.where("lastName").regex(str, "si")
-                , Criteria.where("technologyCommunity").regex(str, "si")
-                , Criteria.where("interviewerID").regex(str, "si"));
 
+    @Override
+    public List<Employee> searchInterviewer(String str) {
+        LOGGER.info(" Search string is : {} ", str);
+        Criteria criteria = new Criteria();
+        criteria.andOperator(Criteria.where("employeeType").is(EmployeeType.I), Criteria.where("isDeleted").is("N"))
+                .orOperator(
+                        Criteria.where("firstName").regex(str, "si")
+                        , Criteria.where("lastName").regex(str, "si")
+                        , Criteria.where("emailId").regex(str, "si")
+                        , Criteria.where("employeeId").regex(str, "si")
+                        , Criteria.where("technologyCommunity").regex(str, "si"));
 
         Query query = new Query(criteria);
+        System.out.println(query.toString());
+        return mongoTemplate.find(query, Employee.class);
+    }
 
+
+    @Override
+    public List<Employee> searchRecruiter(String str) {
+        LOGGER.info(" Search string is : {} ", str);
+
+        Criteria criteria = new Criteria();
+        criteria.andOperator(Criteria.where("employeeType").is(EmployeeType.R), Criteria.where("isDeleted").is("N"))
+                .orOperator(
+                        Criteria.where("firstName").regex(str, "si")
+                        , Criteria.where("lastName").regex(str, "si")
+                        , Criteria.where("emailId").regex(str, "si")
+                        , Criteria.where("employeeId").regex(str, "si"));
+
+        Query query = new Query(criteria);
         System.out.println(query.toString());
         return mongoTemplate.find(query, Employee.class);
     }
@@ -115,14 +127,14 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
         LOGGER.info("EmployeeServiceImpl updateEmployee()  ID is :{}", id);
 
         Optional<Employee> interviewerDAO = employeeRepository.findById(id);
-        Employee existingEmployee =interviewerDAO.get();
+        Employee existingEmployee = interviewerDAO.get();
 
         employee.setId(id);
         LocalDateTime localDateTime = LocalDateTime.now();
         employee.setCreatedDate(existingEmployee.getCreatedDate());
         employee.setModifiedDate(localDateTime);
         return Optional.of(employeeRepository.save(employee));
-     }
+    }
 
     /*
      * (non-Javadoc)
@@ -131,18 +143,21 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
      * com.softvision.service.EmployeeService #deleteEmployee(java.lang.String)
      */
     @Override
-    public void deleteEmployee(String id) {
+    public Optional<Employee> deleteEmployee(String id) {
         LOGGER.info("EmployeeServiceImpl deleteInterviewer()  ID is :{}", id);
         Optional<Employee> employeeDAO = employeeRepository.findById(id);
+        Optional<Employee> returnEmployee = Optional.empty();
         if (employeeDAO.isPresent()) {
             LOGGER.info("EmployeeServiceImpl deleteRecruiter()  is not empty");
             Employee optEmployee = employeeDAO.get();
-            optEmployee.setDeleted(true);
+            optEmployee.setIsDeleted(ServiceConstants.YES);
             optEmployee.setModifiedDate(LocalDateTime.now());
-            employeeRepository.save(optEmployee);
+            returnEmployee = Optional.of(employeeRepository.save(optEmployee));
+        } else {
+            throw new EmployeeNotFoundException("Employee Not Found!");
         }
         LOGGER.info("EmployeeServiceImpl exit from deleteRecruiter()");
-
+        return returnEmployee;
     }
 
     /*
@@ -155,7 +170,7 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
     public void deleteAllEmployees() {
         LOGGER.info("EmployeeServiceImpl entered into deleteAllRecruiter()  ");
         List<Employee> employeeList = employeeRepository.findAll();
-        employeeList.forEach(employee -> employee.setDeleted(true));
+        employeeList.forEach(employee -> employee.setIsDeleted(ServiceConstants.NO));
         employeeRepository.saveAll(employeeList);
         LOGGER.info("EmployeeServiceImpl exit from deleteAllRecruiter()  ");
 
@@ -172,7 +187,7 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
         Query query = new Query();
 
         Criteria criteria = new Criteria();
-        criteria.andOperator(Criteria.where("employeeType").is(EmployeeType.INTERVIEWER),
+        criteria.andOperator(Criteria.where("employeeType").is(EmployeeType.I),
                 Criteria.where("technologyCommunity").is(technicalCommunity)
                 , Criteria.where("bandExperience").gte(expInmonths));
         List<Employee> employees = mongoTemplate.find(query, Employee.class);

@@ -2,14 +2,22 @@ package com.softvision.model;
 
 
 public enum InterviewerType {
-    M,
-    I,
-    A,
-    R;
+    M("m"),
+    I("i"),
+    A("a"),
+    R("r");
+
+    private String s;
+
+    InterviewerType(String s) {
+        this.s = s;
+    }
 
     @Override
     public String toString() {
-        return M + "," + I + "," + A + "," + R;
+        return s;
     }
+
+
 }
 

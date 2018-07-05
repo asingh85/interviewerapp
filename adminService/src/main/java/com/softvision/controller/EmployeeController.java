@@ -1,6 +1,5 @@
 package com.softvision.controller;
 
-import com.softvision.common.ServiceConstants;
 import com.softvision.helper.Loggable;
 import com.softvision.model.Employee;
 import com.softvision.model.EmployeeType;
@@ -60,70 +59,49 @@ public class EmployeeController {
     }
 
     @GET
-    @Path("/search")
+    @Path("/recruiter/search")
     @Produces(MediaType.APPLICATION_JSON)
     @Loggable
-    public void search(@Suspended AsyncResponse asyncResponse,
-                       @QueryParam("str") String str) {
+    public void searchRecruiter(@Suspended AsyncResponse asyncResponse,
+                                @QueryParam("str") String str) {
         LOGGER.info("Search string is  : {} ", str);
         if (StringUtils.isEmpty(str)) {
             asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(" Search string cannot be NULL or Empty.").build());
 
         }
-        CompletableFuture.supplyAsync(() -> employeeService.search(str))
+        CompletableFuture.supplyAsync(() -> employeeService.searchRecruiter(str))
                 .thenApply(list -> asyncResponse.resume(list))
                 .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
     }
 
     @GET
+    @Path("/interviewer/search")
     @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
     @Loggable
-    public void getAllEmployees(@Suspended AsyncResponse asyncResponse,
-                                @QueryParam("size") Integer size,
-                                @QueryParam("sort") String sortOrder,
-                                @QueryParam("isDeleted") boolean isDeleted) {
+    public void searchInterviewer(@Suspended AsyncResponse asyncResponse,
+                                  @QueryParam("str") String str) {
+        LOGGER.info("Search string is  : {} ", str);
+        if (StringUtils.isEmpty(str)) {
+            asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(" Search string cannot be NULL or Empty.").build());
 
-        LOGGER.info("Number of elements request is {} and sort order is {} and isDeleted {} ", size, sortOrder, isDeleted);
-        if (StringUtils.isEmpty(sortOrder) && size < 1) {
-            asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Number of elements request should not be 0 and sort order should be given").build());
-        } else if (!isDeleted) {
-            CompletableFuture.supplyAsync(() -> employeeService.getAllEmployees())
-                    .thenApply(v -> (List<Employee>) v.get())
-                    .thenApply(k -> asyncResponse.resume(k.stream().sorted().filter(p -> !p.isDeleted()).collect(Collectors.toList())))
-                    .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
-        } else {
-            CompletableFuture.supplyAsync(() -> employeeService.getAllEmployees())
-                    .thenApply(v -> (List<Employee>) v.get())
-                    .thenApply(k -> asyncResponse.resume(k.stream().sorted().filter(p -> p.isDeleted()).collect(Collectors.toList())))
-                    .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
         }
+        CompletableFuture.supplyAsync(() -> employeeService.searchInterviewer(str))
+                .thenApply(list -> asyncResponse.resume(list))
+                .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
     }
+
 
     @GET
     @Path("/recruiter")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Loggable
-    public void getAllRecruiters(@Suspended AsyncResponse asyncResponse,
-                                 @QueryParam("size") Integer size,
-                                 @QueryParam("sort") String sortOrder,
-                                 @QueryParam("isDeleted") boolean isDeleted) {
-
-        LOGGER.info("Number of elements request is {} and sort order is {} and isDeleted {} ", size, sortOrder, isDeleted);
-        if (StringUtils.isEmpty(sortOrder) && size < 1) {
-            asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Number of elements request should not be 0 and sort order should be given").build());
-        } else if (!isDeleted) {
-            CompletableFuture.supplyAsync(() -> employeeService.getAllEmployees())
-                    .thenApply(v -> (List<Employee>) v.get())
-                    .thenApply(k -> asyncResponse.resume(k.stream().sorted().filter(p -> !p.isDeleted() && p.getEmployeeType().equals(EmployeeType.RECRUITER)).collect(Collectors.toList())))
-                    .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
-        } else {
-            CompletableFuture.supplyAsync(() -> employeeService.getAllEmployees())
-                    .thenApply(v -> (List<Employee>) v.get())
-                    .thenApply(k -> asyncResponse.resume(k.stream().sorted().filter(p -> p.isDeleted() && p.getEmployeeType().equals(EmployeeType.RECRUITER)).collect(Collectors.toList())))
-                    .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
-        }
+    public void getAllRecruiters(@Suspended AsyncResponse asyncResponse) {
+        CompletableFuture.supplyAsync(() -> {
+            return employeeService.getAllRecruiters();
+        })
+                .thenApply(optional -> asyncResponse.resume(optional.get()))
+                .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
     }
 
     @GET
@@ -131,25 +109,13 @@ public class EmployeeController {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Loggable
-    public void getAllInterviwers(@Suspended AsyncResponse asyncResponse,
-                                  @QueryParam("size") Integer size,
-                                  @QueryParam("sort") String sortOrder,
-                                  @QueryParam("isDeleted") boolean isDeleted) {
+    public void getAllInterviwers(@Suspended AsyncResponse asyncResponse) {
+        CompletableFuture.supplyAsync(() -> {
+            return employeeService.getAllInterviewers();
+        })
+                .thenApply(optional -> asyncResponse.resume(optional.get()))
+                .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
 
-        LOGGER.info("Number of elements request is {} and sort order is {} and isDeleted {} ", size, sortOrder, isDeleted);
-        if (StringUtils.isEmpty(sortOrder) && size < 1) {
-            asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Number of elements request should not be 0 and sort order should be given").build());
-        } else if (!isDeleted) {
-            CompletableFuture.supplyAsync(() -> employeeService.getAllEmployees())
-                    .thenApply(v -> (List<Employee>) v.get())
-                    .thenApply(k -> asyncResponse.resume(k.stream().sorted().filter(p -> !p.isDeleted() && p.getEmployeeType().equals(EmployeeType.INTERVIEWER)).collect(Collectors.toList())))
-                    .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
-        } else {
-            CompletableFuture.supplyAsync(() -> employeeService.getAllEmployees())
-                    .thenApply(v -> (List<Employee>) v.get())
-                    .thenApply(k -> asyncResponse.resume(k.stream().sorted().filter(p -> p.isDeleted() && p.getEmployeeType().equals(EmployeeType.INTERVIEWER)).collect(Collectors.toList())))
-                    .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
-        }
     }
 
 
@@ -185,12 +151,8 @@ public class EmployeeController {
     @Loggable
     public void deleteAllEmployees(@Suspended AsyncResponse asyncResponse) {
         LOGGER.info(" Deleting All employee ");
-
         CompletableFuture future = CompletableFuture.runAsync(() -> employeeService.deleteAllEmployees());
-        Response.ResponseBuilder rb = Response.ok("the test response");
-        Response response = rb.header("Access-Control-Allow-Origin", "*")
-                .status(Response.Status.BAD_REQUEST).entity("Input missing").build();
-        asyncResponse.resume(response);
+        asyncResponse.resume(future.join());
     }
 
     @GET
@@ -206,7 +168,7 @@ public class EmployeeController {
         }
         LOGGER.info("Technology Community is {} and as per the Band Experience is {} ", technologyCommunity, bandExperience);
         CompletableFuture<Optional<List<Employee>>> future = CompletableFuture
-                .supplyAsync(() -> employeeService.getAllEmployeesByBandExp(bandExperience, technologyCommunity));
+                .supplyAsync(() -> employeeService.getAllEmployeesByBandExp(bandExperience, technologyCommunity.toLowerCase()));
         Optional<List<Employee>> employees = future.join();
         if (employees.isPresent()) {
             asyncResponse.resume(employees.get().stream()
