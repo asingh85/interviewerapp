@@ -160,22 +160,20 @@ public class EmployeeController {
     @Produces(MediaType.APPLICATION_JSON)
     @Loggable
     public void getAllEmployeesByBandExp(@Suspended AsyncResponse asyncResponse,
-                                         @QueryParam("tc") String technologyCommunity,
-                                         @QueryParam("be") int bandExperience) {
+                                         @QueryParam("be") int bandExperience,
+                                         @QueryParam("tc") String technologyCommunity) {
 
         if (StringUtils.isEmpty(technologyCommunity) && bandExperience < 3) {
             asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Technology Community should not be empty and the Band Experience should also not be empty").build());
         }
         LOGGER.info("Technology Community is {} and as per the Band Experience is {} ", technologyCommunity, bandExperience);
-        CompletableFuture<Optional<List<Employee>>> future = CompletableFuture
-                .supplyAsync(() -> employeeService.getAllEmployeesByBandExp(bandExperience, technologyCommunity.toLowerCase()));
-        Optional<List<Employee>> employees = future.join();
-        if (employees.isPresent()) {
-            asyncResponse.resume(employees.get().stream()
-                    .sorted(Comparator.comparing(Employee::getBandExperience))
-                    .collect(Collectors.toList()));
-        }
+        CompletableFuture<Optional<List<EmployeeType>>> future = CompletableFuture
+                .supplyAsync(() -> employeeService.getAllEmployeesByBandExp(bandExperience, technologyCommunity));
+        asyncResponse.resume(future.join().get().stream()
+                .sorted()
+                .collect(Collectors.toList()));
     }
+
 
     @GET
     @Path("/interviewer/tech")
