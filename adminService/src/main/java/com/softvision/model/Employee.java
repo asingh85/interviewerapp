@@ -43,7 +43,7 @@ public class Employee implements Comparable<Employee> {
     @Pattern(regexp = "(^$|[0-9]{10})", message = "Invalid Phone number")
     private String contactNumber;
 
-    private boolean isDeleted;
+    private String isDeleted;
 
     // Interview / Recruiter
     private EmployeeType employeeType;

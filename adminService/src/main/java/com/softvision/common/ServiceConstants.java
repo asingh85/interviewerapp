@@ -119,4 +119,9 @@ public class ServiceConstants {
      */
     public static final String CANDIDATE_DELETED = "Candidate has been deleted successfully";
 
+
+    public static final String YES = "Y";
+
+    public static final String NO = "N";
+
 }
