@@ -18,7 +18,7 @@ public class Email implements Serializable{
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
 	
-	
+
 	/** The to recipients. */
 	private String toRecipients;
 	
@@ -39,9 +39,9 @@ public class Email implements Serializable{
 	
 	/** The template name. */
 	private String templateName;
-	
-	
-	
-	
+
+
+
+
 
 }

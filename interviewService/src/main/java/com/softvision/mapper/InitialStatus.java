@@ -1,114 +1,73 @@
 package com.softvision.mapper;
 
-import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
-import com.netflix.discovery.shared.Application;
-import com.softvision.constant.InterviewConstant;
 import com.softvision.exception.ServiceException;
+import com.softvision.helper.ServiceClientHelper;
 import com.softvision.model.Employee;
 import com.softvision.model.Interview;
 import com.softvision.model.InterviewStatus;
 import com.softvision.service.InterviewService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 @Component
 public class InitialStatus {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(InitialStatus.class);
 
     @Inject
     InterviewService interviewService;
 
     @Inject
-    RestTemplate restTemplate;
-
-    @Inject
-    private EurekaClient eurekaClient;
-
-    @Value("${admin.service}")
-    private String serviceName;
-
-    @Value("${admin.method}")
-    private String serviceMethod;
-
+    ServiceClientHelper serviceClientHelper;
 
     public Optional<Interview> publishInterview(String candidateId, int experience, String technology) throws ServiceException {
 
-        List<Employee> interviewerList = rejesterToAdminService(technology, experience);
+        Collection<Employee> interviewerList = serviceClientHelper.getInterviewers(technology, experience);
+        List<String> interviewIds = new ArrayList<>();
+        List<String> interviewEmail = new ArrayList<>();
         if (interviewerList != null && !interviewerList.isEmpty()) {
-            getInterviewIds(interviewerList);
+
+
+//            List<Employee> employees = persons.stream()
+//                    .filter(p -> p.getLastName().equals("l1"))
+//                    .map(p -> new Employee(p.getName(), p.getLastName(), 1000))
+//                    .collect(Collectors.toList());
+
+            interviewIds= interviewerList.stream().filter(employee -> employee.getEmployeeId() != null)
+                     .map(employee -> employee.getEmployeeId()).collect(Collectors.toList());
+
+
+//                interviewerList.stream().forEach(i -> {
+//                    interviewIds.add(i.getEmployeeId());
+//                    interviewEmail.add(i.getEmailId());
+//                });
         }
-
-        //TODO  fetch intervier list from admin service passing candidate and exp
-
-        List<String> interviewIdList = new ArrayList();
-        interviewIdList.add("6224");
-        interviewIdList.add("6269");
-        interviewIdList.add("2006");
+        System.out.println(interviewIds);
 
         LocalDateTime joiningDate = LocalDateTime.now();
         Interview interview = new Interview();
         interview.setInterviewStatus(InterviewStatus.INITIATED);
         interview.setInterviewerId(null);
-        interview.setInterviewerList(interviewIdList);
+        interview.setInterviewerList(interviewIds);
         interview.setModifiedDate(joiningDate);
         interview.setCreationTime(joiningDate);
         interview.setCandidateId(candidateId);
         interview.setTechnology(technology);
-
-        return interviewService.addInterview(interview);
+        Optional<Interview> addedInterview=  interviewService.addInterview(interview);
+        return addedInterview;
     }
 
-    private List rejesterToAdminService(String technology, int experience) {
-
-        List<Employee> list = null;
-        if ((technology != null && !technology.isEmpty()) && (experience > 0)) {
-            try {
-                Application application = eurekaClient.getApplication(serviceName);
-                InstanceInfo instanceInfo = application.getInstances().get(0);
-                //  String url = "http://spirl181.spi.com:8089/admin/interviewer/bybandexp?tc=JAVA&be=2";
-
-                String url = "http://" + instanceInfo.getIPAddr() + ":" + instanceInfo.getPort()
-                        + "/" + serviceMethod + technology + "&be=" + experience;
-                System.out.println("URL : " + url);
-                list = restTemplate.getForObject(url, List.class);
-                System.out.println("RESPONSE " + list);
-
-
-            } catch (Exception e) {
-                throw new ServiceException(e.getMessage());
-            }
-        } else {
-            throw new ServiceException(InterviewConstant.INVALID_REQUEST);
-        }
-        return list;
-    }
-
-    private void getInterviewIds(List<Employee> interviewerList) {
-        if (interviewerList != null && !interviewerList.isEmpty()) {
-            List<String> interviewIds = new ArrayList<>();
-            List<String> interviewEmail = new ArrayList<>();
-
-            for (int i = 0; i < interviewerList.size(); i++) {
-                Employee interviewer = interviewerList.get(i);
-                interviewIds.add(interviewer.getEmployeeId());
-                interviewEmail.add(interviewer.getEmailId());
-            }
-
-//            interviewerList.stream().forEach(i -> {
-//                    interviewIds.add(i.getInterviewerID());
-//                    interviewEmail.add(i.getEmailId());
-//            });
-
-            // TODO Integrate with email
-            System.out.println(interviewIds);
-
-            System.out.println(interviewEmail);
-        }
+    private void sendmail(Collection<Employee> employeeList, String candidateId) {
+       // TODO need to get candidate information and send mail to all the interviers
     }
 }
