@@ -61,6 +61,8 @@ public class Employee implements Comparable<Employee> {
     // M-Manager , I-interviewer(default)
     private InterviewerType interviewerType;
 
+    private String password;
+
     @Override
     public int compareTo(Employee o) {
         return Comparator.comparing(Employee::getFirstName)
