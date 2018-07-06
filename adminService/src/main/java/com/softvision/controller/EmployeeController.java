@@ -3,8 +3,10 @@ package com.softvision.controller;
 import com.softvision.helper.Loggable;
 import com.softvision.model.Employee;
 import com.softvision.model.EmployeeType;
+import com.softvision.model.Login;
 import com.softvision.model.TechnologyCommunity;
 import com.softvision.service.EmployeeService;
+import com.softvision.service.LoginService;
 import com.softvision.validation.ValidationUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -29,6 +31,30 @@ public class EmployeeController {
 
     @Inject
     EmployeeService employeeService;
+    @Inject
+    LoginService loginService;
+
+    @POST
+    @Path("/login")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public void registerUsers(@Suspended AsyncResponse asyncResponse,
+                              Login login) {
+
+        asyncResponse.resume(loginService.register(login));
+    }
+
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public void loginValidate(@Suspended AsyncResponse asyncResponse,
+                              @QueryParam("email") String email, @QueryParam("pass") String pass) {
+
+        CompletableFuture.supplyAsync(() -> loginService.login(email, pass))
+                .thenApply(v -> asyncResponse.resume(v))
+                .exceptionally(v -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(v.getMessage()).build()));
+
+    }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
