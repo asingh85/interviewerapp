@@ -1,7 +1,7 @@
 package com.softvision.serviceimpl;
 
 import com.softvision.common.ServiceConstants;
-import com.softvision.exception.EmployeeNotFoundException;
+import com.softvision.exception.EmployeeServiceException;
 import com.softvision.model.Employee;
 import com.softvision.model.EmployeeType;
 import com.softvision.model.InterviewerType;
@@ -101,6 +101,12 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
         LocalDateTime localDateTime = LocalDateTime.now();
         employee.setCreatedDate(localDateTime);
         employee.setModifiedDate(localDateTime);
+
+        if (employee.getEmployeeType().equals(EmployeeType.R)) {
+            employee.setBandExperience(0);
+            employee.setInterviewerType(null);
+            employee.setTechnologyCommunity(null);
+        }
         LOGGER.info(" Exit  from addEmployee() ");
         return Optional.of(employeeRepository.insert(employee));
     }
@@ -133,7 +139,7 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
             optEmployee.setModifiedDate(LocalDateTime.now());
             returnEmployee = Optional.of(employeeRepository.save(optEmployee));
         } else {
-            throw new EmployeeNotFoundException("Employee Not Found!");
+            throw new EmployeeServiceException("Employee Not Found!");
         }
         LOGGER.info("EmployeeServiceImpl exit from deleteEmployee()");
         return returnEmployee;
