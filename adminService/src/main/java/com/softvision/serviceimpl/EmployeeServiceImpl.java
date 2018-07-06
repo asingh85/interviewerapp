@@ -33,6 +33,36 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
 
 
     @Override
+    public Optional<Employee> register() {
+        Employee employee = new Employee();
+        LocalDateTime localDateTime = LocalDateTime.now();
+        employee.setCreatedDate(localDateTime);
+        employee.setModifiedDate(localDateTime);
+        employee.setFirstName(ServiceConstants.ADMIN);
+        employee.setLastName(ServiceConstants.ADMIN);
+        employee.setIsDeleted(ServiceConstants.NO);
+        employee.setEmailId(ServiceConstants.DEFAULT_ADMIN_EMAIL);
+        employee.setPassword(ServiceConstants.ADMIN);
+        employee.setEmployeeType(EmployeeType.A);
+        employee.setBandExperience(0);
+        employee.setInterviewerType(InterviewerType.I);
+        employee.setTechnologyCommunity(null);
+        LOGGER.info(" Exit  from addEmployee() ");
+        return Optional.of(employeeRepository.insert(employee));
+    }
+
+    @Override
+    public Optional<Employee> login(String email, String password) {
+        Query query = new Query();
+        Criteria criteria = new Criteria();
+        criteria = criteria.andOperator(Criteria.where("emailId").is(email),
+                Criteria.where("password").is(password));
+        query = query.addCriteria(criteria);
+        System.out.println(query.toString());
+        return Optional.of(mongoTemplate.findOne(query, Employee.class));
+    }
+
+    @Override
     public Optional<List<Employee>> getAllRecruiters() {
         Criteria criteria = new Criteria();
         criteria.andOperator(Criteria.where("employeeType").is(EmployeeType.R),

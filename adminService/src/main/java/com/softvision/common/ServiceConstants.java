@@ -1,10 +1,13 @@
 package com.softvision.common;
 
+import lombok.experimental.UtilityClass;
+
 /**
  * The Class ServiceConstants.
  *
  * @author arun.p
  */
+@UtilityClass
 public class ServiceConstants {
 
 
@@ -123,5 +126,7 @@ public class ServiceConstants {
     public static final String YES = "Y";
 
     public static final String NO = "N";
+
+    public static final String DEFAULT_ADMIN_EMAIL = "admin@softvision.com";
 
 }
