@@ -223,8 +223,8 @@ public class EmployeeController {
     @Produces(MediaType.APPLICATION_JSON)
     @Loggable
     public void getInterviewerByType(@Suspended AsyncResponse asyncResponse,
-                                     @QueryParam("tc") String technologyCommunity,
-                                     @QueryParam("it") String interviewerType) {
+                                    @QueryParam("tc") String technologyCommunity,
+                                    @QueryParam("it") String interviewerType) {
         CompletableFuture<Optional<List<EmployeeType>>> future = CompletableFuture
                 .supplyAsync(() -> employeeService.getInterviewerByType(technologyCommunity, interviewerType));
         asyncResponse.resume(future.join().get().stream()

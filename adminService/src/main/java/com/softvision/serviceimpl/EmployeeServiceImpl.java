@@ -197,10 +197,27 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
         );
         query.addCriteria(criteria);
         List<Employee> employees = mongoTemplate.find(query, Employee.class);
+        if(employees != null && !employees.isEmpty()){
+            getByDefaultByBandExp(technicalCommunity);
+        }
         LOGGER.info("Interviewers information {} :", employees);
         return Optional.of(employees);
     }
 
+
+    private Optional<List<Employee>> getByDefaultByBandExp(String technicalCommunity){
+
+        Query query = new Query();
+        Criteria criteria = new Criteria();
+        criteria.andOperator(Criteria.where("employeeType").is(EmployeeType.I),
+                Criteria.where("bandExperience").gte(7),
+                Criteria.where("technologyCommunity").is(TechnologyCommunity.valueOf(technicalCommunity))
+        );
+        query.addCriteria(criteria);
+        List<Employee> employees = mongoTemplate.find(query, Employee.class);
+        LOGGER.info("Interviewers information {} :", employees);
+        return Optional.of(employees);
+    }
 
     @Override
     public Optional<List<TechnologyCommunity>> getTechStack() {
