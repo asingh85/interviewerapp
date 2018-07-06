@@ -198,15 +198,14 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
         query.addCriteria(criteria);
         List<Employee> employees = mongoTemplate.find(query, Employee.class);
         if(employees != null && !employees.isEmpty()){
-            getByDefaultByBandExp(technicalCommunity);
+            employees = getByDefaultByBandExp(technicalCommunity);
         }
         LOGGER.info("Interviewers information {} :", employees);
         return Optional.of(employees);
     }
 
 
-    private Optional<List<Employee>> getByDefaultByBandExp(String technicalCommunity){
-
+    private List<Employee> getByDefaultByBandExp(String technicalCommunity){
         Query query = new Query();
         Criteria criteria = new Criteria();
         criteria.andOperator(Criteria.where("employeeType").is(EmployeeType.I),
@@ -215,8 +214,8 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
         );
         query.addCriteria(criteria);
         List<Employee> employees = mongoTemplate.find(query, Employee.class);
-        LOGGER.info("Interviewers information {} :", employees);
-        return Optional.of(employees);
+        LOGGER.info(" getByDefaultByBandExp | Interviewers information {} :", employees);
+        return employees;
     }
 
     @Override
