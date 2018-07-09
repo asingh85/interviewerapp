@@ -39,6 +39,7 @@ public class EmployeeController {
 
 
     @GET
+    @Path("/login")
     @Produces(MediaType.APPLICATION_JSON)
     public void loginValidate(@Suspended AsyncResponse asyncResponse,
                               @QueryParam("email") String email, @QueryParam("pass") String pass) {

@@ -131,12 +131,14 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
         LocalDateTime localDateTime = LocalDateTime.now();
         employee.setCreatedDate(localDateTime);
         employee.setModifiedDate(localDateTime);
+        employee.setIsDeleted("N");
 
         if (employee.getEmployeeType().equals(EmployeeType.R)) {
             employee.setBandExperience(0);
             employee.setInterviewerType(null);
             employee.setTechnologyCommunity(null);
         }
+
         LOGGER.info(" Exit  from addEmployee() ");
         return Optional.of(employeeRepository.insert(employee));
     }
