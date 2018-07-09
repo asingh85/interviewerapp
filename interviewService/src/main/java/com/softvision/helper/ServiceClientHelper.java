@@ -5,6 +5,7 @@ import com.netflix.discovery.EurekaClient;
 import com.netflix.discovery.shared.Application;
 import com.softvision.constant.InterviewConstant;
 import com.softvision.exception.ServiceException;
+import com.softvision.model.Candidate;
 import com.softvision.model.Employee;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +35,11 @@ public class ServiceClientHelper {
     @Value("${admin.method}")
     private String serviceMethod;
 
+    @Value("${admin.candidate.method}")
+    private String candidateMethod;
+
+
+
     private InstanceInfo getInstance(String serviceName){
         try{
             Application application = eurekaClient.getApplication(serviceName);
@@ -50,7 +56,7 @@ public class ServiceClientHelper {
             try {
                 InstanceInfo instanceInfo= getInstance(adminService);
                 String url = "http://" + instanceInfo.getIPAddr() + ":" + instanceInfo.getPort()
-                        + "/" + serviceMethod + technology + "&be=" + experience;
+                        + "/" + serviceMethod +"be=" + experience +"&tc="+ technology ;
                 System.out.println("URL : " + url);
                 Employee[] forNow = restTemplate.getForObject(url, Employee[].class);
                 searchList= Arrays.asList(forNow);
@@ -65,4 +71,24 @@ public class ServiceClientHelper {
         return searchList;
     }
 
+    public Candidate getCandidateById(String candidateId) {
+        Candidate candidate= null;
+        if (candidateId != null && !candidateId.isEmpty()) {
+            try {
+                InstanceInfo instanceInfo= getInstance(adminService);
+                String url = "http://" + instanceInfo.getIPAddr() + ":" + instanceInfo.getPort()
+                        + "/" + candidateMethod+"/" + candidateId;
+                System.out.println("URL : " + url);
+                 candidate = restTemplate.getForObject(url, Candidate.class);
+
+                System.out.println("-------------------------candidate----------------------"+candidate);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new ServiceException(e.getMessage());
+            }
+        } else {
+            throw new ServiceException(InterviewConstant.INVALID_REQUEST);
+        }
+        return candidate;
+    }
 }

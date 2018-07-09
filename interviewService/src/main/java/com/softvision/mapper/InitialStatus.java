@@ -3,6 +3,7 @@ package com.softvision.mapper;
 import com.netflix.discovery.EurekaClient;
 import com.softvision.exception.ServiceException;
 import com.softvision.helper.ServiceClientHelper;
+import com.softvision.model.Candidate;
 import com.softvision.model.Employee;
 import com.softvision.model.Interview;
 import com.softvision.model.InterviewStatus;
@@ -33,24 +34,13 @@ public class InitialStatus {
     public Optional<Interview> publishInterview(String candidateId, int experience, String technology) throws ServiceException {
 
         Collection<Employee> interviewerList = serviceClientHelper.getInterviewers(technology, experience);
+        Candidate candidate = serviceClientHelper.getCandidateById(candidateId);
+
         List<String> interviewIds = new ArrayList<>();
         List<String> interviewEmail = new ArrayList<>();
         if (interviewerList != null && !interviewerList.isEmpty()) {
-
-
-//            List<Employee> employees = persons.stream()
-//                    .filter(p -> p.getLastName().equals("l1"))
-//                    .map(p -> new Employee(p.getName(), p.getLastName(), 1000))
-//                    .collect(Collectors.toList());
-
             interviewIds= interviewerList.stream().filter(employee -> employee.getEmployeeId() != null)
                      .map(employee -> employee.getEmployeeId()).collect(Collectors.toList());
-
-
-//                interviewerList.stream().forEach(i -> {
-//                    interviewIds.add(i.getEmployeeId());
-//                    interviewEmail.add(i.getEmailId());
-//                });
         }
         System.out.println(interviewIds);
 
@@ -64,10 +54,12 @@ public class InitialStatus {
         interview.setCandidateId(candidateId);
         interview.setTechnology(technology);
         Optional<Interview> addedInterview=  interviewService.addInterview(interview);
+
+        sendmail(interviewerList,candidate);
         return addedInterview;
     }
 
-    private void sendmail(Collection<Employee> employeeList, String candidateId) {
+    private void sendmail(Collection<Employee> employeeList, Candidate candidate) {
        // TODO need to get candidate information and send mail to all the interviers
     }
 }
