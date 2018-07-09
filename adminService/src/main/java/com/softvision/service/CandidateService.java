@@ -33,7 +33,7 @@ public interface CandidateService {
      * @param id the id
      * @return the string
      */
-    String deleteCandidateById(final String id);
+    Candidate deleteCandidateById(final String id);
 
     /**
      * Save all candidates.

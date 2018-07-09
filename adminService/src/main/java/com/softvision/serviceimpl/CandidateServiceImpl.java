@@ -6,15 +6,19 @@ import com.softvision.repository.CandidateRepository;
 import com.softvision.service.CandidateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.*;
 
 /**
  * @author arun.p The Class CandidateServiceImpl.
@@ -50,6 +54,7 @@ public class CandidateServiceImpl implements CandidateService {
     public Candidate addCandidate(final Candidate candidate) {
 
         candidate.setCreatedDate(LocalDateTime.now());
+        candidate.setIsActive(true);
 
         return candidateRepository.insert(candidate);
     }
@@ -76,19 +81,19 @@ public class CandidateServiceImpl implements CandidateService {
      * com.softvision.service.CandidateService#deleteCandidateById(java.lang.String)
      */
     @Override
-    public String deleteCandidateById(final String id) {
+    public Candidate deleteCandidateById(final String id) {
 
         Optional<Candidate> optionalCandidate = candidateRepository.findById(id);
 
         if (!optionalCandidate.isPresent()) {
-            return ServiceConstants.CANDIDATE_NOT_FOUND;
+            throw new RuntimeException("Employee Not Found!");
         }
 
         Candidate candidate = optionalCandidate.get();
         candidate.setIsActive(false);
         candidate.setModifiedDate(LocalDateTime.now());
         candidateRepository.save(candidate);
-        return ServiceConstants.CANDIDATE_DELETED;
+        return new Candidate();
 
     }
 
@@ -118,7 +123,15 @@ public class CandidateServiceImpl implements CandidateService {
 
     @Override
     public List<Candidate> findByIsActiveIsTrue() {
-        return candidateRepository.findByIsActiveIsTrue();
+
+        Candidate candidate = new Candidate();
+        candidate.setIsActive(true);
+        ExampleMatcher matcher = ExampleMatcher.matching().withIgnoreNullValues().
+                                 withMatcher("isActive", exact());
+        Example<Candidate> exCandidate = Example.of(candidate, matcher);
+        System.out.println(exCandidate);
+        System.out.println(candidateRepository.findAll(exCandidate));
+        return candidateRepository.findAll(exCandidate);
     }
 
     /*

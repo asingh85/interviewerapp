@@ -98,7 +98,7 @@ public class CandidateController {
     @Produces(MediaType.APPLICATION_JSON)
     public void deleteCandidateById(@Suspended final AsyncResponse asyncResponse, @PathParam("id") final String id) {
         LOGGER.info("In deleteCandidateById() :: Deleting candidate {} ", id);
-        CompletableFuture<String> future = CompletableFuture
+        CompletableFuture<Candidate> future = CompletableFuture
                 .supplyAsync(() -> candidateService.deleteCandidateById(id));
         asyncResponse.resume(Response.status(Response.Status.OK).entity(future.join()).build());
 
