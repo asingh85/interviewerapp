@@ -131,14 +131,12 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
         LocalDateTime localDateTime = LocalDateTime.now();
         employee.setCreatedDate(localDateTime);
         employee.setModifiedDate(localDateTime);
-        employee.setIsDeleted("N");
 
         if (employee.getEmployeeType().equals(EmployeeType.R)) {
             employee.setBandExperience(0);
             employee.setInterviewerType(null);
             employee.setTechnologyCommunity(null);
         }
-
         LOGGER.info(" Exit  from addEmployee() ");
         return Optional.of(employeeRepository.insert(employee));
     }
@@ -179,13 +177,14 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
 
 
     @Override
-    public void deleteAllEmployees() {
+    public Optional<List<Employee>> deleteAllEmployees() {
         LOGGER.info("EmployeeServiceImpl entered into deleteAllEmployees()  ");
         List<Employee> employeeList = employeeRepository.findAll();
         employeeList.forEach(employee -> employee.setIsDeleted(ServiceConstants.YES));
         employeeRepository.saveAll(employeeList);
         LOGGER.info("EmployeeServiceImpl exit from deleteAllEmployees()  ");
 
+        return Optional.empty();
     }
 
 
@@ -199,7 +198,7 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
         );
         query.addCriteria(criteria);
         List<Employee> employees = mongoTemplate.find(query, Employee.class);
-        if(employees != null && !employees.isEmpty()){
+        if (employees != null && !employees.isEmpty()) {
             employees = getByDefaultByBandExp(technicalCommunity);
         }
         LOGGER.info("Interviewers information {} :", employees);
@@ -207,7 +206,7 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
     }
 
 
-    private List<Employee> getByDefaultByBandExp(String technicalCommunity){
+    private List<Employee> getByDefaultByBandExp(String technicalCommunity) {
         Query query = new Query();
         Criteria criteria = new Criteria();
         criteria.andOperator(Criteria.where("employeeType").is(EmployeeType.I),
@@ -224,6 +223,7 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
     public Optional<List<TechnologyCommunity>> getTechStack() {
         LOGGER.info("EmployeeServiceImpl entered into getTechStack()");
         List<TechnologyCommunity> list = Arrays.asList(TechnologyCommunity.values());
+        LOGGER.info("EmployeeServiceImpl entered into getTechStack()is {} :", list);
         return Optional.of(list);
     }
 
@@ -232,6 +232,7 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
     public Optional<List<EmployeeType>> getEmployeeType() {
         LOGGER.info("EmployeeServiceImpl entered into getEmployeeType()");
         List<EmployeeType> list = Arrays.asList(EmployeeType.values());
+        LOGGER.info("EmployeeServiceImpl entered into getEmployeeType() is {} :", list);
         return Optional.of(list);
     }
 

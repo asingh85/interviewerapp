@@ -39,5 +39,5 @@ public interface EmployeeService<T extends Employee> {
 
     Optional<T> deleteEmployee(String id);
 
-    void deleteAllEmployees();
+    Optional<List<Employee>> deleteAllEmployees();
 }
