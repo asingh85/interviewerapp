@@ -9,6 +9,11 @@ import java.util.Optional;
 
 public interface EmployeeService<T extends Employee> {
 
+
+    Optional<T> register();
+
+    Optional<T> login(String userName, String password);
+
     Optional<List<Employee>> getAllRecruiters();
 
     Optional<List<Employee>> getAllInterviewers();
