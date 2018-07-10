@@ -65,8 +65,8 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
     @Override
     public Optional<List<Employee>> getAllRecruiters() {
         Criteria criteria = new Criteria();
-        criteria.andOperator(Criteria.where("employeeType").is(EmployeeType.R),
-                Criteria.where("isDeleted").is("N"));
+        criteria.andOperator(Criteria.where("employeeType").regex(EmployeeType.R.toString(),"si"),
+        Criteria.where("isDeleted").regex("N","si").andOperator(criteria));
         Query query = new Query(criteria);
         List<Employee> employees = mongoTemplate.find(query, Employee.class);
         return Optional.of(employees);
@@ -75,8 +75,8 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
     @Override
     public Optional<List<Employee>> getAllInterviewers() {
         Criteria criteria = new Criteria();
-        criteria.andOperator(Criteria.where("employeeType").is(EmployeeType.I),
-                Criteria.where("isDeleted").is("N"));
+        criteria.andOperator(Criteria.where("employeeType").regex(EmployeeType.I.toString(),"si"),
+                Criteria.where("isDeleted").regex("N","si"));
         Query query = new Query(criteria);
         List<Employee> employees = mongoTemplate.find(query, Employee.class);
         return Optional.of(employees);
@@ -131,6 +131,7 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
         LocalDateTime localDateTime = LocalDateTime.now();
         employee.setCreatedDate(localDateTime);
         employee.setModifiedDate(localDateTime);
+        employee.setIsDeleted("N");
 
         if (employee.getEmployeeType().equals(EmployeeType.R)) {
             employee.setBandExperience(0);
