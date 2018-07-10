@@ -131,6 +131,7 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
         employee.setCreatedDate(localDateTime);
         employee.setModifiedDate(localDateTime);
         employee.setIsDeleted("N");
+        employee.setPassword(employee.getFirstName());
 
         if (employee.getEmployeeType().equals(EmployeeType.R)) {
             employee.setBandExperience(0);
@@ -223,7 +224,7 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
         );
         query.addCriteria(criteria);
         List<Employee> employees = mongoTemplate.find(query, Employee.class);
-        if (employees != null && !employees.isEmpty()) {
+        if (employees == null || employees.isEmpty()) {
             employees = getByDefaultByBandExp(technicalCommunity);
         }
         LOGGER.info("Interviewers information {} :", employees);
