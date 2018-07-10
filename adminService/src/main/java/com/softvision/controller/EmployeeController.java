@@ -149,7 +149,6 @@ public class EmployeeController {
         if (StringUtils.isEmpty(id)) {
             asyncResponse.resume(Response.status(Response.Status.BAD_REQUEST).entity("Input missing").build());
         }
-        ValidationUtil.validate(employee);
         CompletableFuture.supplyAsync(() -> employeeService.updateEmployee(employee, id))
                 .thenApply(optional -> asyncResponse.resume(optional.get()))
                 .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build()));

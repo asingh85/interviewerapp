@@ -119,7 +119,7 @@ public class CandidateServiceImplTest {
 
     @Test
     public void testDeleteCandidateById() {
-        String returnValue = null;
+        Candidate returnValue = null;
         Mockito.when(candidateRepository.findById("1")).thenReturn(optionalCandidate);
         Candidate candidate1 = optionalCandidate.get();
         Mockito.when(candidateRepository.save(candidate1)).thenReturn(candidate1);

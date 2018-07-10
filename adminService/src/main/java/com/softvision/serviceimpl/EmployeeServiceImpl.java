@@ -8,17 +8,16 @@ import com.softvision.model.InterviewerType;
 import com.softvision.model.TechnologyCommunity;
 import com.softvision.repository.EmployeeRepository;
 import com.softvision.service.EmployeeService;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import javax.inject.Inject;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-
-import javax.inject.Inject;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService<Employee> {
@@ -65,8 +64,8 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
     @Override
     public Optional<List<Employee>> getAllRecruiters() {
         Criteria criteria = new Criteria();
-        criteria.andOperator(Criteria.where("employeeType").regex(EmployeeType.R.toString(),"si"),
-        Criteria.where("isDeleted").regex("N","si").andOperator(criteria));
+        criteria.andOperator(Criteria.where("employeeType").regex(EmployeeType.R.toString(), "si"),
+                Criteria.where("isDeleted").regex("N", "si").andOperator(criteria));
         Query query = new Query(criteria);
         List<Employee> employees = mongoTemplate.find(query, Employee.class);
         return Optional.of(employees);
@@ -75,8 +74,8 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
     @Override
     public Optional<List<Employee>> getAllInterviewers() {
         Criteria criteria = new Criteria();
-        criteria.andOperator(Criteria.where("employeeType").regex(EmployeeType.I.toString(),"si"),
-                Criteria.where("isDeleted").regex("N","si"));
+        criteria.andOperator(Criteria.where("employeeType").regex(EmployeeType.I.toString(), "si"),
+                Criteria.where("isDeleted").regex("N", "si"));
         Query query = new Query(criteria);
         List<Employee> employees = mongoTemplate.find(query, Employee.class);
         return Optional.of(employees);
@@ -142,21 +141,46 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
         return Optional.of(employeeRepository.insert(employee));
     }
 
-
     @Override
     public Optional<Employee> updateEmployee(Employee employee, String id) {
         LOGGER.info("EmployeeServiceImpl updateEmployee()  ID is :{}", id);
 
         Optional<Employee> interviewerDAO = employeeRepository.findById(id);
-        Employee existingEmployee = interviewerDAO.get();
+        if(interviewerDAO.isPresent()){
+            Employee existingEmployee = interviewerDAO.get();
 
-        employee.setId(id);
-        LocalDateTime localDateTime = LocalDateTime.now();
-        employee.setCreatedDate(existingEmployee.getCreatedDate());
-        employee.setModifiedDate(localDateTime);
-        return Optional.of(employeeRepository.save(employee));
+            if (employee.getEmployeeId() != null && !(employee.getEmployeeId().equals(existingEmployee.getEmployeeId())))
+                existingEmployee.setEmployeeId(employee.getEmployeeId());
+            if (employee.getFirstName() != null && !(employee.getFirstName().equals(existingEmployee.getFirstName())))
+                existingEmployee.setFirstName(employee.getFirstName());
+            if (employee.getLastName() != null && !(employee.getLastName().equals(existingEmployee.getLastName())))
+                existingEmployee.setLastName(employee.getLastName());
+            if (employee.getEmailId() != null && !(employee.getEmailId().equals(existingEmployee.getEmailId())))
+                existingEmployee.setEmailId(employee.getEmailId());
+            if (employee.getContactNumber() != null && !(employee.getContactNumber().equals(existingEmployee.getContactNumber())))
+                existingEmployee.setContactNumber(employee.getContactNumber());
+
+            if (employee.getIsDeleted() != null && !(employee.getIsDeleted().equals(existingEmployee.getIsDeleted()))) {
+                existingEmployee.setIsDeleted(employee.getIsDeleted());
+            }
+
+            LocalDateTime localDateTime = LocalDateTime.now();
+            employee.setModifiedDate(localDateTime);
+
+            if (existingEmployee.getEmployeeType().equals(EmployeeType.I) || existingEmployee.getEmployeeType().equals(EmployeeType.A)) {
+
+                if (employee.getTechnologyCommunity() != null && !(employee.getTechnologyCommunity().equals(existingEmployee.getTechnologyCommunity())))
+                    existingEmployee.setTechnologyCommunity(employee.getTechnologyCommunity());
+                if (employee.getBandExperience() != 0 && !(employee.getBandExperience() == (existingEmployee.getBandExperience())))
+                    existingEmployee.setBandExperience(employee.getBandExperience());
+                if (employee.getInterviewerType() != null && !(employee.getInterviewerType().equals(existingEmployee.getInterviewerType())))
+                    existingEmployee.setInterviewerType(employee.getInterviewerType());
+            }
+            return Optional.of(employeeRepository.save(existingEmployee));
+        }else {
+            throw new EmployeeServiceException("Employee Not Found!");
+        }
     }
-
 
     @Override
     public Optional<Employee> deleteEmployee(String id) {
