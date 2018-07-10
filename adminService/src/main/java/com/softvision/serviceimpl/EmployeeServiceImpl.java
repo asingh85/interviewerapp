@@ -218,9 +218,9 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
     public Optional<List<Employee>> getAllEmployeesByBandExp(int expInmonths, String technicalCommunity) {
         Query query = new Query();
         Criteria criteria = new Criteria();
-        criteria.andOperator(Criteria.where("employeeType").is(EmployeeType.I),
+        criteria.andOperator(Criteria.where("employeeType").regex(EmployeeType.I.toString(),"si"),
                 Criteria.where("bandExperience").gte(expInmonths),
-                Criteria.where("technologyCommunity").is(TechnologyCommunity.valueOf(technicalCommunity))
+                Criteria.where("technologyCommunity").regex(TechnologyCommunity.valueOf(technicalCommunity).toString(),"si")
         );
         query.addCriteria(criteria);
         List<Employee> employees = mongoTemplate.find(query, Employee.class);
