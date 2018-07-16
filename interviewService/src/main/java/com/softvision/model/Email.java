@@ -23,13 +23,13 @@ public class Email implements Serializable{
 	private String from;
 
 	/** The to recipients. */
-	private String toRecipients;
+	private String[] toRecipients;
 	
 	/** The cc recipients. */
-	private String ccRecipients;
+	private String[] ccRecipients;
 	
 	/** The bcc recipients. */
-	private String bccRecipients;
+	private String[] bccRecipients;
 	
 	/** The subject. */
 	private String subject;
@@ -43,6 +43,8 @@ public class Email implements Serializable{
 	/** The template name. */
 	private String templateName;
 
+	/** The body. */
+	private String text;
 
 
 

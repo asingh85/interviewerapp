@@ -2,10 +2,7 @@ package com.softvision.serviceimpl;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -43,49 +40,88 @@ import com.softvision.service.EmailService;
 @Service
 public class EmailServiceImpl implements EmailService {
 
-	/** The java mail sender. */
+	/**
+	 * The java mail sender.
+	 */
 	@Inject
 	private JavaMailSender javaMailSender;
 
-	/** The env. */
+	/**
+	 * The env.
+	 */
 	@Inject
 	private Environment env;
 
-	/** The email template engine. */
+	/**
+	 * The email template engine.
+	 */
 	@Autowired
 	private TemplateEngine emailTemplateEngine;
 
-	/** The Constant LOGGER. */
+	/**
+	 * The Constant LOGGER.
+	 */
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmailController.class);
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * com.softvision.service.EmailService#sendEmail(com.softvision.model.Email)
 	 */
 	@Override
 	public String sendEmail(final Email email) throws ServiceException {
 		String status = null;
-		try{
+		try {
 			SimpleMailMessage mailMessage = new SimpleMailMessage();
 			mailMessage.setFrom(email.getFrom());
 			mailMessage.setTo(email.getToRecipients());
 			mailMessage.setSentDate(new Date());
 			mailMessage.setSubject(email.getSubject());
-			mailMessage.setText(email.getBody().toString());
+
+			String templateBody = getTemplateContentFromFile(email.getTemplateName());
+			String mergedTemplate = mergeContentOnTemplate(templateBody,createContext());
+			System.out.println(mergedTemplate);
+			mailMessage.setText(email.getText());
 			javaMailSender.send(mailMessage);
 			status = "Successfully send the mail";
-		}catch (Exception ex) {
+		} catch (Exception ex) {
 			status = "Exception while sending mail";
+			System.out.println("Stack Trace from EMAIL MODULE ----------------------" );
 			ex.printStackTrace();
 		}
 
 		return status;
 	}
 
-}
+	private Context createContext() {
+		Context context = new Context();
+		Map<String,Object> contextMap = new HashMap<>();
+		contextMap.put("interviewerName","Krishna");
+		context.setVariables(contextMap);
+		return context;
+	}
 
+
+	private String getTemplateContentFromFile(String templateName) throws IOException {
+		ClassLoader classLoader = getClass().getClassLoader();
+
+		String templateContent = IOUtils.toString(classLoader.getResourceAsStream(ServiceConstants.TEMPLATES_FOLDER
+				+ ServiceConstants.BACK_SLASH + templateName + ServiceConstants.DOT + ServiceConstants.HTML));
+
+		return templateContent;
+	}
+
+	private String mergeContentOnTemplate(final String templateBody, final Context context) throws Exception {
+		try {
+
+		return emailTemplateEngine.process(templateBody, context);
+		} catch (Exception e) {
+		throw new Exception(e);
+		}
+		}
+
+}
 
 //
 //		try {

@@ -1,6 +1,7 @@
 package com.softvision.controller;
 
 import com.softvision.constant.InterviewConstant;
+import com.softvision.constant.ServiceConstants;
 import com.softvision.exception.ServiceException;
 import com.softvision.helper.Loggable;
 import com.softvision.helper.ServiceClientHelper;
@@ -9,17 +10,17 @@ import com.softvision.mapper.ApprovedStatus;
 import com.softvision.mapper.InitialStatus;
 import com.softvision.mapper.NextRoundStatus;
 import com.softvision.mapper.RejectedStatus;
-import com.softvision.model.Candidate;
-import com.softvision.model.Employee;
-import com.softvision.model.Interviewlog;
+import com.softvision.model.*;
 import com.softvision.repository.InterviewLogRepository;
 import com.softvision.service.EmailService;
 import com.softvision.service.InterviewService;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
+import javax.swing.text.html.Option;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -60,6 +61,10 @@ public class InterviewController {
     @Inject
     ServiceClientHelper serviceClientHelper;
 
+    @Inject
+    EmailService emailService;
+
+
     @GET
     @Path("/publish")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -72,12 +77,37 @@ public class InterviewController {
         if ((candidateId != null && !candidateId.isEmpty())
                 && (technology != null && !technology.isEmpty()) && candidateExp > 0) {
 
-            Collection<Employee> interviewerList = serviceClientHelper.getInterviewers(technology, candidateExp);
-            Candidate candidate = serviceClientHelper.getCandidateById(candidateId);
-            CompletableFuture.supplyAsync(() -> initialStatus.publishInterview(interviewerList,candidate))
+            CompletableFuture<Collection<Employee>> completableFutureinterviewerList = CompletableFuture.supplyAsync( () -> {
+                try{
+                    return serviceClientHelper.getInterviewers(technology, candidateExp);
+                } catch ( Exception ex) {
+                   return Collections.emptyList();
+                }
+
+            });
+
+            CompletableFuture<Candidate> completableFutureCandidate = CompletableFuture.supplyAsync( ()-> {
+                try {
+                    return serviceClientHelper.getCandidateById(candidateId);
+                } catch (Exception ex) {
+                    return null;
+                }
+
+            });
+
+            Collection<Employee> interviewerList = completableFutureinterviewerList.join();
+            Candidate candidate = completableFutureCandidate.join();
+
+            CompletableFuture.supplyAsync(() -> {
+                                 return initialStatus.publishInterview(interviewerList,candidate);
+                            })
                             .thenApply(optional -> asyncResponse.resume(optional.get()))
-                            .exceptionally(e -> asyncResponse.resume(
-                                Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
+                            .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()))
+                            .thenApply(v -> emailService.sendEmail(buildEmail().apply(interviewerList)))
+                            .exceptionally( e -> {
+                                LOGGER.error("Error while sending email {}", e.getMessage());
+                                return null;
+                            });
         } else {
             asyncResponse.resume(
                     Response.status(Response.Status.BAD_REQUEST).entity(InterviewConstant.INVALID_REQUEST).build());
@@ -366,6 +396,20 @@ public class InterviewController {
                         Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build());
             }
 
+        });
+    }
+
+    private Function<Collection<Employee>,Email> buildEmail() {
+        return (e -> {
+
+            Email email = new Email();
+            List<String> list = e.stream().map(v -> v.getEmailId()).collect(Collectors.toList());
+//            email.setToRecipients(list.toArray(new String[list.size()]));
+            email.setToRecipients(new String[] {"krishnakumar.arjunan@softvision.com"});
+            email.setSubject(ServiceConstants.CANDIDATE_PUBLISHED);
+            email.setTemplateName("published");
+            email.setText("Hello");
+            return email;
         });
     }
 }
