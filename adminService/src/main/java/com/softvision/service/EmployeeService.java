@@ -14,7 +14,7 @@ public interface EmployeeService<T extends Employee> {
 
     Optional<T> login(String userName, String password);
 
-    Optional<List<Employee>> getAllRecruiters();
+    Optional<List<T>> getAllRecruiters();
 
     Optional<List<Employee>> getAllInterviewers();
 
@@ -28,16 +28,16 @@ public interface EmployeeService<T extends Employee> {
 
     Optional<T> updateEmployee(T employee, String id);
 
-    Optional<List<Employee>> getAllEmployeesByBandExp(int expInmonths, String technicalCommunity);
+    Optional<List<T>> getAllEmployeesByBandExp(int expInmonths, String technicalCommunity);
 
     // user in UI
     Optional<List<TechnologyCommunity>> getTechStack();
 
     Optional<List<EmployeeType>> getEmployeeType();
 
-    Optional<List<Employee>> getInterviewerByType(String technicalCommunity, String interviewerType);
+    Optional<List<T>> getInterviewerByType(String technicalCommunity, String interviewerType);
 
     Optional<T> deleteEmployee(String id);
 
-    Optional<List<Employee>> deleteAllEmployees();
+    Optional<List<T>> deleteAllEmployees();
 }

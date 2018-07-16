@@ -114,4 +114,6 @@ public class ServiceConstants {
 	
 	/** The Constant TEMPLATES_FOLDER. */
 	public static final String TEMPLATES_FOLDER = "templates";
+
+	public static final String CANDIDATE_PUBLISHED = "Ready for Interview";
 }

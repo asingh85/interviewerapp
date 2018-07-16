@@ -1,18 +1,18 @@
 package com.softvision.mapper;
 
 import com.netflix.discovery.EurekaClient;
+import com.softvision.constant.ServiceConstants;
 import com.softvision.exception.ServiceException;
 import com.softvision.helper.ServiceClientHelper;
-import com.softvision.model.Candidate;
-import com.softvision.model.Employee;
-import com.softvision.model.Interview;
-import com.softvision.model.InterviewStatus;
+import com.softvision.model.*;
+import com.softvision.service.EmailService;
 import com.softvision.service.InterviewService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.slf4j.Logger;
@@ -29,12 +29,11 @@ public class InitialStatus {
     InterviewService interviewService;
 
     @Inject
-    ServiceClientHelper serviceClientHelper;
+    EmailService emailService;
 
-    public Optional<Interview> publishInterview(String candidateId, int experience, String technology) throws ServiceException {
 
-        Collection<Employee> interviewerList = serviceClientHelper.getInterviewers(technology, experience);
-        Candidate candidate = serviceClientHelper.getCandidateById(candidateId);
+
+    public Optional<Interview> publishInterview( Collection<Employee> interviewerList, Candidate candidate) throws ServiceException {
 
         List<String> interviewIds = new ArrayList<>();
         List<String> interviewEmail = new ArrayList<>();
@@ -43,7 +42,6 @@ public class InitialStatus {
                      .map(employee -> employee.getEmployeeId()).collect(Collectors.toList());
         }
         System.out.println(interviewIds);
-
         LocalDateTime joiningDate = LocalDateTime.now();
         Interview interview = new Interview();
         interview.setInterviewStatus(InterviewStatus.INITIATED);
@@ -51,15 +49,32 @@ public class InitialStatus {
         interview.setInterviewerList(interviewIds);
         interview.setModifiedDate(joiningDate);
         interview.setCreationTime(joiningDate);
-        interview.setCandidateId(candidateId);
-        interview.setTechnology(technology);
+        interview.setCandidateId(candidate.getCandidateId());
+        interview.setTechnology(candidate.getTechnologyStack());
         Optional<Interview> addedInterview=  interviewService.addInterview(interview);
 
-        sendmail(interviewerList,candidate);
+        Email email = buildEmail().apply(interviewerList);
+        System.out.println(email.getSubject());
+        System.out.println(email.getToRecipients());
+        System.out.println(emailService.sendEmail(email));
+
         return addedInterview;
+
     }
 
-    private void sendmail(Collection<Employee> employeeList, Candidate candidate) {
-       // TODO need to get candidate information and send mail to all the interviers
+    private Function<Collection<Employee>,Email> buildEmail() {
+        return (e -> {
+
+            Email email = new Email();
+            String employeeList = e.stream()
+                                    .map(v -> v.getEmailId())
+                                    .collect(Collectors.joining(","));
+
+            email.setToRecipients("krishnakumar.arjunan@softvision.com");
+            email.setSubject(ServiceConstants.CANDIDATE_PUBLISHED);
+            email.setTemplateName("published");
+            return email;
+        });
     }
+
 }

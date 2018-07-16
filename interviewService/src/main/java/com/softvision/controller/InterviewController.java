@@ -3,21 +3,20 @@ package com.softvision.controller;
 import com.softvision.constant.InterviewConstant;
 import com.softvision.exception.ServiceException;
 import com.softvision.helper.Loggable;
+import com.softvision.helper.ServiceClientHelper;
 import com.softvision.mapper.AcknowledgedStatus;
 import com.softvision.mapper.ApprovedStatus;
 import com.softvision.mapper.InitialStatus;
 import com.softvision.mapper.NextRoundStatus;
 import com.softvision.mapper.RejectedStatus;
+import com.softvision.model.Candidate;
+import com.softvision.model.Employee;
 import com.softvision.model.Interviewlog;
 import com.softvision.repository.InterviewLogRepository;
+import com.softvision.service.EmailService;
 import com.softvision.service.InterviewService;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
@@ -58,6 +57,9 @@ public class InterviewController {
     @Inject
     NextRoundStatus nextRoundStatus;
 
+    @Inject
+    ServiceClientHelper serviceClientHelper;
+
     @GET
     @Path("/publish")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -69,11 +71,13 @@ public class InterviewController {
                         @QueryParam("technology") String technology) {
         if ((candidateId != null && !candidateId.isEmpty())
                 && (technology != null && !technology.isEmpty()) && candidateExp > 0) {
-            CompletableFuture.supplyAsync(() -> {
-                return initialStatus.publishInterview(candidateId, candidateExp, technology);
-            }).thenApply(optional -> asyncResponse.resume(optional.get()))
-                    .exceptionally(e -> asyncResponse.resume(
-                            Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
+
+            Collection<Employee> interviewerList = serviceClientHelper.getInterviewers(technology, candidateExp);
+            Candidate candidate = serviceClientHelper.getCandidateById(candidateId);
+            CompletableFuture.supplyAsync(() -> initialStatus.publishInterview(interviewerList,candidate))
+                            .thenApply(optional -> asyncResponse.resume(optional.get()))
+                            .exceptionally(e -> asyncResponse.resume(
+                                Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
         } else {
             asyncResponse.resume(
                     Response.status(Response.Status.BAD_REQUEST).entity(InterviewConstant.INVALID_REQUEST).build());

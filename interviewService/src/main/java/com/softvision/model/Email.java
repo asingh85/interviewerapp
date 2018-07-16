@@ -17,7 +17,10 @@ public class Email implements Serializable{
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
-	
+
+
+	/** Email From */
+	private String from;
 
 	/** The to recipients. */
 	private String toRecipients;

@@ -48,8 +48,9 @@ public class EmailController {
 		LOGGER.info(ServiceConstants.IN + ServiceConstants.BLANK_SPACE + ServiceConstants.SEND_EMAIL_METHOD
 				+ ServiceConstants.DOUBLE_COLON + ServiceConstants.SENDING_EMAIL_TO + ServiceConstants.DOUBLE_COLON
 				+ email.getToRecipients());
-		CompletableFuture.supplyAsync(() -> emailService.sendEmail(email)).thenApply(
-				emailSent -> asyncResponse.resume(Response.status(Response.Status.OK).entity(emailSent).build())).exceptionally(e -> asyncResponse.resume(
+		CompletableFuture.supplyAsync(() -> emailService.sendEmail(email))
+				.thenApply(emailSent -> asyncResponse.resume(Response.status(Response.Status.OK).entity(emailSent).build()))
+				.exceptionally(e -> asyncResponse.resume(
                         Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
 	}
 
