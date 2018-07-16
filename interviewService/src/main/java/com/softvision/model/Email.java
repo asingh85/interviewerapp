@@ -5,6 +5,7 @@ import java.io.Serializable;
 import org.json.simple.JSONObject;
 
 import lombok.Data;
+import org.thymeleaf.context.Context;
 
 /**
  * The Class Email.
@@ -45,6 +46,9 @@ public class Email implements Serializable{
 
 	/** The body. */
 	private String text;
+
+	/** The Context */
+	private Context context;
 
 
 

@@ -18,6 +18,7 @@ import com.softvision.service.InterviewService;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.swing.text.html.Option;
@@ -34,6 +35,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.thymeleaf.context.Context;
 
 @Path("/screen")
 public class InterviewController {
@@ -103,7 +105,11 @@ public class InterviewController {
                             })
                             .thenApply(optional -> asyncResponse.resume(optional.get()))
                             .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()))
-                            .thenApply(v -> emailService.sendEmail(buildEmail().apply(interviewerList)))
+                            .thenApply(v -> {
+                                Map<String,Object> map = publishDataBuilder().apply(baseDataBuilder().apply(candidate));
+                                Context context = buildContext().apply(map);
+                                return emailService.sendEmail(buildEmail(context,"published").apply(interviewerList));
+                            })
                             .exceptionally( e -> {
                                 LOGGER.error("Error while sending email {}", e.getMessage());
                                 return null;
@@ -215,11 +221,11 @@ public class InterviewController {
                              @QueryParam("interviewerId") String interviewerId) {
         if ((id != null && !id.isEmpty()) && (interviewerId != null && !interviewerId.isEmpty())
                 ) {
-            CompletableFuture.supplyAsync(() -> {
-                return acknowledgedStatus.acknowledgedInterview(id, interviewerId);
-            }).thenApply(optional -> asyncResponse.resume(optional.get()))
-                    .exceptionally(e -> asyncResponse.resume(
+            CompletableFuture.supplyAsync(() -> acknowledgedStatus.acknowledgedInterview(id, interviewerId))
+                            .thenApply(optional -> asyncResponse.resume(optional.get()))
+                            .exceptionally(e -> asyncResponse.resume(
                             Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build()));
+
         } else {
             asyncResponse.resume(
                     Response.status(Response.Status.BAD_REQUEST).entity(InterviewConstant.INVALID_REQUEST).build());
@@ -399,17 +405,50 @@ public class InterviewController {
         });
     }
 
-    private Function<Collection<Employee>,Email> buildEmail() {
+    private Function<Collection<Employee>,Email> buildEmail(Context context,String templateType) {
         return (e -> {
 
             Email email = new Email();
+            email.setFrom("arjunankrishnakumar1@gmail.com");
             List<String> list = e.stream().map(v -> v.getEmailId()).collect(Collectors.toList());
 //            email.setToRecipients(list.toArray(new String[list.size()]));
             email.setToRecipients(new String[] {"krishnakumar.arjunan@softvision.com"});
             email.setSubject(ServiceConstants.CANDIDATE_PUBLISHED);
-            email.setTemplateName("published");
-            email.setText("Hello");
+            email.setTemplateName(templateType);
+            email.setContext(context);
             return email;
         });
+    }
+
+    private Function<Map<String,Object>,Context> buildContext() {
+        return ( m ->  new Context(Locale.getDefault(),m));
+    }
+
+    private Function<Candidate,Map<String,Object>> baseDataBuilder( ) {
+        return(candidate -> {
+            Map<String,Object> map = new HashMap<>();
+            map.put("candidateName",candidate.getFirstName()+" "+ candidate.getLastName());
+            map.put("experience",candidate.getExperience());
+            map.put("technologyStack",candidate.getTechnologyStack());
+            map.put("interviewDate",candidate.getInterviewDate());
+            return map;
+        });
+    }
+
+    private Function<Map<String,Object>,Map<String,Object>> publishDataBuilder( ) {
+        return( m -> {
+                 Map<String,Object> map = new HashMap<>(m);
+                 map.put("recruiterName","Recruitment Team");
+                return map;
+        } );
+    }
+
+    private Function<Map<String,Object>,Map<String,Object>> acknowledgedDataBuilder( ) {
+        return( m -> {
+            Map<String,Object> map = new HashMap<>(m);
+            map.put("interviewerName","interviewerName");
+            map.put("interviewerEmail","interviewerEmail");
+            return map;
+        } );
     }
 }
