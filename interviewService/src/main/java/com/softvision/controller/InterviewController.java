@@ -230,7 +230,7 @@ public class InterviewController {
                                 System.out.println(employee);
                                 Map<String,Object> map = acknowledgedDataBuilder(employee.get().get(0)).apply(baseDataBuilder().apply(candidate));
                                 Context context = buildContext().apply(map);
-                                return emailService.sendEmail(buildEmail(context,"acknowledged",ServiceConstants.CANDIDATE_PUBLISHED).apply(employee.get()));
+                                return emailService.sendEmail(buildEmail(context,"acknowledged",ServiceConstants.CANDIDATE_ACKNOWLEDGED).apply(employee.get()));
                             })
                             .exceptionally(e -> {
                                 e.printStackTrace();
@@ -458,6 +458,7 @@ public class InterviewController {
             Map<String,Object> map = new HashMap<>(m);
             map.put("interviewerName",employee.getFirstName() + " " + employee.getLastName());
             map.put("interviewerEmail",employee.getEmailId());
+            map.put("recruiterName", employee.getFirstName());
             return map;
         } );
     }
