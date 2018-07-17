@@ -81,7 +81,7 @@ public class InterviewServiceImpl implements InterviewService<Interview> {
     }
 
     @Override
-    public Optional addInterview(Interview interview) throws ServiceException {
+    public Optional<Interview> addInterview(Interview interview) throws ServiceException {
         try {
             return Optional.of(interviewRepository.save(interview));
         } catch (DataAccessResourceFailureException | ServiceException e) {
@@ -170,7 +170,7 @@ public class InterviewServiceImpl implements InterviewService<Interview> {
     }
 
     @Override
-    public Optional addInterviewLog(Interviewlog interviewlog) throws ServiceException {
+    public Optional<Interviewlog> addInterviewLog(Interviewlog interviewlog) throws ServiceException {
         try {
             return Optional.of(interviewLogRepository.save(interviewlog));
         } catch (DataAccessResourceFailureException | ServiceException e) {

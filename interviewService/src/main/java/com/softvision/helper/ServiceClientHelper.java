@@ -7,11 +7,11 @@ import com.softvision.constant.InterviewConstant;
 import com.softvision.exception.ServiceException;
 import com.softvision.model.Candidate;
 import com.softvision.model.Employee;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+
+import java.util.*;
 import javax.inject.Inject;
+import javax.swing.text.html.Option;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +34,10 @@ public class ServiceClientHelper {
 
     @Value("${admin.method}")
     private String serviceMethod;
+
+
+    @Value("${admin.interviewer.getbyid}")
+    private String interviewer;
 
     @Value("${admin.candidate.method}")
     private String candidateMethod;
@@ -69,6 +73,27 @@ public class ServiceClientHelper {
             throw new ServiceException(InterviewConstant.INVALID_REQUEST);
         }
         return searchList;
+    }
+
+    public Optional<List<Employee>> getInterviewer(String interviewerId) {
+        Optional<List<Employee>> forNow  ;
+        if ((interviewerId != null && !interviewerId.isEmpty())) {
+            try {
+                InstanceInfo instanceInfo= getInstance(adminService);
+                String url = "http://" + instanceInfo.getIPAddr() + ":" + instanceInfo.getPort()
+                        + "/" + interviewer+"/empid/"+interviewerId ;
+                System.out.println("URL : " + url);
+                Employee[] employees = restTemplate.getForObject(url, Employee[].class);
+                List<Employee> employeeList = Arrays.asList(employees);
+                forNow = Optional.ofNullable(employeeList);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new ServiceException(e.getMessage());
+            }
+        } else {
+            throw new ServiceException(InterviewConstant.INVALID_REQUEST);
+        }
+        return forNow;
     }
 
     public Candidate getCandidateById(String candidateId) {

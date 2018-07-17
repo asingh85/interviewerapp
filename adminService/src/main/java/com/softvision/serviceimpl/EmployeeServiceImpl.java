@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
+import javax.swing.text.html.Option;
+
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -275,4 +277,16 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
         LOGGER.info("Interviewers information {} :", employees);
         return Optional.of(employees);
     }
+
+    @Override
+    public Optional<List<Employee>> getInterviewerByEmpID(String empid) {
+        LOGGER.info("EmployeeServiceImpl entered into getInterviewerByEmpID()");
+        Query query = new Query();
+        query.addCriteria( Criteria.where("employeeId").is(empid));
+        List<Employee> employee = mongoTemplate.find(query,Employee.class);
+        LOGGER.info("EmployeeServiceImpl entered into getInterviewerByEmpID() is {} :", employee);
+        return Optional.ofNullable(employee);
+    }
+
+
 }

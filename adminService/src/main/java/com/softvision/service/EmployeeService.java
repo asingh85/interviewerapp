@@ -37,6 +37,8 @@ public interface EmployeeService<T extends Employee> {
 
     Optional<List<T>> getInterviewerByType(String technicalCommunity, String interviewerType);
 
+    Optional<List<T>> getInterviewerByEmpID(String id);
+
     Optional<T> deleteEmployee(String id);
 
     Optional<List<T>> deleteAllEmployees();

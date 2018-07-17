@@ -5,6 +5,7 @@ import java.io.Serializable;
 import org.json.simple.JSONObject;
 
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
 import org.thymeleaf.context.Context;
 
 /**

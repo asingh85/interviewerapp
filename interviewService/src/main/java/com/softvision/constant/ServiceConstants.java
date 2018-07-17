@@ -116,4 +116,6 @@ public class ServiceConstants {
 	public static final String TEMPLATES_FOLDER = "templates";
 
 	public static final String CANDIDATE_PUBLISHED = "Ready for Interview";
+
+	public static final String CANDIDATE_ACKNOWLEDGED = "Interview Acknowledgement";
 }

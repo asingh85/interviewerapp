@@ -18,6 +18,7 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -63,6 +64,9 @@ public class EmailServiceImpl implements EmailService {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(EmailController.class);
 
+    @Value("${email.service.from.address}")
+    private String from;
+
     /*
      * (non-Javadoc)
      *
@@ -78,7 +82,7 @@ public class EmailServiceImpl implements EmailService {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper mailMessage = new MimeMessageHelper(mimeMessage, false, "utf-8");
             mimeMessage.setContent(mergedTemplate, "text/html");
-            mailMessage.setFrom(email.getFrom());
+            mailMessage.setFrom(from);
             mailMessage.setTo(email.getToRecipients());
             mailMessage.setSentDate(new Date());
             mailMessage.setSubject(email.getSubject());
@@ -86,7 +90,6 @@ public class EmailServiceImpl implements EmailService {
             status = "Successfully send the mail";
         } catch (Exception ex) {
             status = "Exception while sending mail";
-            System.out.println("Stack Trace from EMAIL MODULE ----------------------");
             ex.printStackTrace();
         }
 

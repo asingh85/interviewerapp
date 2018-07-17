@@ -12,7 +12,7 @@ public interface InterviewService<T> {
 
     Optional<T> addInterview(Interview interview) throws ServiceException;
 
-    Optional<T> addInterviewLog(Interviewlog interviewlog) throws ServiceException;
+    Optional<Interviewlog> addInterviewLog(Interviewlog interviewlog) throws ServiceException;
 
     void deleteInterview(String id) throws ServiceException;
 

@@ -19,7 +19,7 @@ public class AcknowledgedStatus {
     @Inject
     InterviewService interviewService;
 
-    public Optional<Interviewlog> acknowledgedInterview(String id, String interviewerId) {
+    public Optional<Interview> acknowledgedInterview(String id, String interviewerId) {
         Optional<Interview> interviewObj = interviewService.getById(id);
         if (interviewObj.isPresent()) {
             Interview interview = interviewObj.get();

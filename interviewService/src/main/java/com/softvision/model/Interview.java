@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "interview")
 @Data
-public class Interview  {
+public class        Interview  {
 
     @Id
     @GeneratedValue

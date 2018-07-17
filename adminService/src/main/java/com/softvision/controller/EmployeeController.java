@@ -232,5 +232,18 @@ public class EmployeeController {
                 .collect(Collectors.toList()));
     }
 
+    @GET
+    @Path("/interviewer/empid/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Loggable
+    public void getInterviewerByEmpID(@Suspended AsyncResponse asyncResponse,
+                                     @PathParam("id") String employeeId) {
+        CompletableFuture<Optional<List<EmployeeType>>> future = CompletableFuture
+                .supplyAsync(() -> employeeService.getInterviewerByEmpID(employeeId));
+        asyncResponse.resume(future.join().get().stream()
+                .sorted()
+                .collect(Collectors.toList()));
+    }
+
 
 }
